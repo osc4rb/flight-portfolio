@@ -10,11 +10,11 @@ button{font:inherit;cursor:pointer}
 [hidden]{display:none!important}
 
 /* loader */
-.loader{position:fixed;inset:0;z-index:50;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;background:var(--bg);color:var(--tx);transition:opacity .6s}
+.loader{position:fixed;inset:0;z-index:50;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;background:#0d1020;color:var(--tx);transition:opacity .6s}
 .loader.done{opacity:0;pointer-events:none}
 .l-name{margin:0;font:700 26px var(--sys);color:var(--hi)}
-.l-line{margin:6px 0 0;width:min(320px,70vw);height:3px;border-radius:3px;background:#282726;overflow:hidden}
-.l-line span{display:block;height:100%;width:0;background:var(--ac);transition:width .3s}
+.l-line{margin:6px 0 0;width:min(320px,70vw);height:3px;border-radius:3px;background:#1e2440;overflow:hidden}
+.l-line span{display:block;height:100%;width:0;background:#5f7dff;box-shadow:0 0 10px #5f7dff;transition:width .3s}
 .l-step{margin:0;font:13px var(--mono);color:var(--mu)}
 .l-back{margin-top:18px;color:var(--mu);font-size:14px}
 .loader.err .l-step{color:#ef8a6f;max-width:420px;text-align:center}
@@ -22,6 +22,9 @@ button{font:inherit;cursor:pointer}
 /* hud */
 .hud{position:absolute;inset:0;pointer-events:none}
 .hud>*{pointer-events:auto}
+/* the opening (Reveal.js): no HUD until the island is revealed */
+.hud,.touch-buttons{transition:opacity .6s .3s}
+.game.intro .hud,.game.intro .touch-buttons{opacity:0;pointer-events:none}
 .h-top{position:absolute;top:14px;left:14px;right:14px;display:flex;gap:8px;align-items:center;pointer-events:none}
 .h-top>*{pointer-events:auto}
 .h-top .h-right{margin-left:auto}

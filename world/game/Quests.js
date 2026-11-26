@@ -25,7 +25,7 @@ export class Quests
         this.el.querySelector('.h-msghead').addEventListener('click', () => this.toggle())
         this.step = this.list.findIndex(q => !this.isDone(q.goal))
         // the first message once the world is up; nothing if every step is already done on this device
-        if(this.step >= 0) setTimeout(() => this.say(this.list[this.step].text), 2500)
+        if(this.step >= 0) this.game.reveal.then(() => setTimeout(() => this.say(this.list[this.step].text), 1500))
         else this.el.hidden = true
     }
 

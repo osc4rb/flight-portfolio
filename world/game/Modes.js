@@ -37,7 +37,7 @@ export class Modes
         // flight comes first: you start beside the jet, with the computer a few steps away
         this.game.walker.moveTo(this.game.jet.door.add(new THREE.Vector3(3, 1.2, 3)), Math.PI * 0.75)
         this.game.walker.setActive(true)
-        this.game.hud.ready()
+        this.game.reveal.then(() => this.game.hud.ready())
         this.refreshPrompt()
     }
 

@@ -26,14 +26,26 @@ Changed (each marked `[world patch]` in the code):
 - `Player.js`: drives only when `game.mode === 'drive'`, and only then moves the camera and touch joystick.
 - `View.js`: the focus point follows height too, and `game.cameraOverride` lets the jet's chase camera take over.
 - `Ticker.js`: delta is never negative, and a zero-length frame is skipped. Either one panics Rapier.
-- `Materials/MeshDefaultMaterial.js`: his shading model, copied. Patches: water band and reveal are off by default,
-  `flipBackNormals` lets grass keep an up normal on both sides, and emissive is added for the hover glow.
+- `Materials/MeshDefaultMaterial.js`: his shading model, copied. Patches: the water band is off by default,
+  `flipBackNormals` lets grass keep an up normal on both sides, and emissive is added for the hover glow. The reveal
+  is on, as in his (it was off until 2026-11-25).
+- `Materials/MeshGridMaterial.js`: his grid material, copied unchanged (the dark grid around the opening disc).
 
 Not used from his repo: his world (`World/`, all `Areas`), his server and multiplayer, BlackFriday, and anything in
 `static/` (models, textures, sounds, fonts). Those are not cleared for reuse. The full download of his sources is
 kept read-only in `../vendor/folio-2025/` for reference.
 
 ## Ours (`game/`)
+- `Reveal.js`: the opening, ported from his `Reveal.js`, `World/Intro.js` and `World/Grid.js`. A blue ring closes as
+  the loader fades and shrinks away. A 3.5 m disc of the island then opens on a dark blue grid, with a "Click to start"
+  label (words in `site.js` → `world.intro`). A click, a tap, Enter, Space, W or ↑ sweeps the glowing edge out to 45 m
+  (back.in, 2 s); then everything shows. His timing and eases are kept. The sound is synthesized (`Sound.reveal()`).
+  - Every MeshDefaultMaterial cuts at the reveal distance with his glowing band. Other materials get `maskNode`, and
+    MeshDefaultMaterials get `maskShadowNode`, so hidden things cast no shadow into the disc.
+  - The HUD (`.game.intro`), the quests and the Juice hover all wait for `game.reveal.then()`.
+  - The input filter is `intro` until the sweep starts, and `wandering` 150 ms later, so Enter does not also board
+    the jet.
+  - `?skip=1` or `#skip` opens the world at once.
 - `Stage.js`: the island built in code:
   - terrain mesh plus a Rapier heightfield on the same grid
   - sea, roads, runway and trees

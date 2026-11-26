@@ -37,7 +37,7 @@ export class MeshDefaultMaterial extends THREE.MeshLambertNodeMaterial
         this.hasLightBounce = parameters.hasLightBounce ?? true
         this.hasFog = parameters.hasFog ?? true
         this.hasWater = parameters.hasWater ?? false            // [world patch] off by default: no water band
-        this.hasReveal = parameters.hasReveal ?? false          // [world patch] off by default: no reveal intro
+        this.hasReveal = parameters.hasReveal ?? true
         this.flipBackNormals = parameters.flipBackNormals ?? true // [world patch] grass keeps its up normal on both sides
         this.hasEmissive = parameters.hasEmissive ?? true        // [world patch] hover glow adds emissive
 

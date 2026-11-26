@@ -190,6 +190,8 @@ window.FLIGHT_SITE = {
   // the 3D world's quests: messages from Oscar in the corner of the screen, one step at a time. Each step ends when
   // its `goal` achievement unlocks (the ids are in world/game/Achievements.js).
   world: {
+    // the opening disc (world/game/Reveal.js): the label beside it
+    intro: { start: "Click to start", note: "or press Enter · M turns the sound off", tap: "Tap to start", tapNote: "" },
     from: "Oscar",
     quests: [
       { goal: "takeoff",  text: "Hey, welcome to my island! The jet is right behind you: walk up to it, press E, then hold W to take off." },

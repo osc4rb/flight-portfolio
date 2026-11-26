@@ -34,6 +34,7 @@ import { Juice } from '../game/Juice.js'
 import { Grass } from '../game/Grass.js'
 import { Look } from '../game/Look.js'
 import { Ambience } from '../game/Ambience.js'
+import { Reveal } from '../game/Reveal.js'
 
 const noop = () => {}
 const sound = { play: noop, playRandomNext: noop, stop: noop, volume: 0 }
@@ -119,6 +120,7 @@ export class Game
         this.desk = new Desk()                     // the computer by the airstrip: the résumé on its screen
         this.letters = new Letters()               // the name in big blocks you can knock over
         this.sky = new Sky()                       // the blimp with the links, and the secret ring
+        this.reveal = new Reveal()                 // the opening disc: every MeshDefaultMaterial reads its uniforms
         this.look = new Look()                     // folio-2025's lighting, fog and materials, our colours
         this.look.convert()
         this.stage.water.material = this.look.waterMaterial()
@@ -131,5 +133,7 @@ export class Game
 
         progress(1, 'ready')
         this.modes.start()
+        this.reveal.mask()                         // the few materials that are not MeshDefaultMaterial
+        this.reveal.start(this.walker.position)    // the disc opens where you stand, beside the jet
     }
 }

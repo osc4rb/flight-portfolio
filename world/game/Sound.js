@@ -2,7 +2,7 @@
    nothing to license. The context starts on the first key or tap (browsers require a gesture). M toggles mute; the
    choice is kept in localStorage on this device only.
    One-shots: step, jump, land, coin (rising with a streak), talk blips (one voice per person), pop, hit, honk,
-   brick clonk, chime. Loops: truck engine, jet engine, wind. */
+   brick clonk, chime, the opening reveal. Loops: truck engine, jet engine, wind. */
 import { Game } from '../engine/Game.js'
 
 const KEY = 'world-sound'
@@ -135,6 +135,14 @@ export class Sound
     beep(go = false) { if(!this.ok) return; this.tone({ type: 'square', f0: go ? 880 : 440, a: 0.004, d: go ? 0.4 : 0.16, peak: 0.07 }) }
     // afterburner light: a low thump and a rush
     boost() { if(!this.ok) return; this.tone({ type: 'sine', f0: 120, f1: 45, d: 0.4, peak: 0.3 }); this.burst({ type: 'bandpass', f0: 200, f1: 1600, q: 0.8, a: 0.05, d: 0.6, peak: 0.18 }) }
+    // the opening: a long rising rush as the ring sweeps out, a soft chord as the island arrives, a low swell under it
+    reveal()
+    {
+        if(!this.ok) return
+        this.burst({ type: 'bandpass', f0: 180, f1: 3400, q: 0.7, a: 1.1, d: 1.1, peak: 0.16 })
+        this.tone({ type: 'sine', f0: 55, f1: 110, a: 1.2, d: 1, peak: 0.16 })
+        ;[ 392, 587, 784, 1175 ].forEach((f, i) => this.tone({ type: 'triangle', f0: f, a: 0.02, d: 1.8, peak: 0.055, delay: 1.25 + i * 0.07 }))
+    }
     whoosh() { if(!this.ok) return; this.burst({ type: 'bandpass', f0: 300, f1: 2400, q: 1.2, a: 0.12, d: 0.35, peak: 0.12 }) }
     boom() { if(!this.ok) return; this.tone({ type: 'sine', f0: 90, f1: 28, d: 0.9, peak: 0.5 }); this.burst({ type: 'lowpass', f0: 1800, f1: 120, a: 0.005, d: 0.9, peak: 0.45 }) }
 

@@ -241,7 +241,7 @@ export class Juice
     pick()
     {
         this.pointerDirty = false
-        if(!this.pointer || (this.game.modes && this.game.modes.locked) || this.game.mode === 'fly') { this.setHover(null); return }
+        if(!this.pointer || (this.game.modes && this.game.modes.locked) || this.game.mode === 'fly' || (this.game.reveal && this.game.reveal.active)) { this.setHover(null); return }
         const r = this.game.canvasElement.getBoundingClientRect()
         this.ndc.set((this.pointer.clientX - r.left) / r.width * 2 - 1, - (this.pointer.clientY - r.top) / r.height * 2 + 1)
         this.ray.setFromCamera(this.ndc, this.game.view.camera)

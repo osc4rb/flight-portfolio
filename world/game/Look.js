@@ -13,12 +13,12 @@ import { foliageMaterial } from './Foliage.js'
 
 const DAY = 8 * 60
 const C = (c) => new THREE.Color(c)
-// day, dusk, night, dawn — light, shadow and fog colours
+// day, dusk, night, dawn — light, shadow and fog colours, and the opening ring's glow (blue at every hour)
 const PRESETS = {
-    day:   { lightColor: C('#fff2e0'), lightIntensity: 1.08, shadowColor: C('#9a8cff'), fogColorA: C('#c8f1ff'), fogColorB: C('#8fb8ff'), fogNearRatio: 0.45, fogFarRatio: 1.6 },
-    dusk:  { lightColor: C('#ffa184'), lightIntensity: 1.25, shadowColor: C('#5a249c'), fogColorA: C('#ffb2a6'), fogColorB: C('#7a5cff'), fogNearRatio: 0.1, fogFarRatio: 1.4 },
-    night: { lightColor: C('#7d8ce0'), lightIntensity: 0.85, shadowColor: C('#2b2a6e'), fogColorA: C('#16265c'), fogColorB: C('#2a1642'), fogNearRatio: - 0.2, fogFarRatio: 1.2 },
-    dawn:  { lightColor: C('#ffb38c'), lightIntensity: 1.25, shadowColor: C('#b03a7a'), fogColorA: C('#ffc9a6'), fogColorB: C('#c58cff'), fogNearRatio: 0.3, fogFarRatio: 1.4 },
+    day:   { revealColor: C('#5f7dff'), revealIntensity: 12, lightColor: C('#fff2e0'), lightIntensity: 1.08, shadowColor: C('#9a8cff'), fogColorA: C('#c8f1ff'), fogColorB: C('#8fb8ff'), fogNearRatio: 0.45, fogFarRatio: 1.6 },
+    dusk:  { revealColor: C('#6670ff'), revealIntensity: 8, lightColor: C('#ffa184'), lightIntensity: 1.25, shadowColor: C('#5a249c'), fogColorA: C('#ffb2a6'), fogColorB: C('#7a5cff'), fogNearRatio: 0.1, fogFarRatio: 1.4 },
+    night: { revealColor: C('#5a6cff'), revealIntensity: 10, lightColor: C('#7d8ce0'), lightIntensity: 0.85, shadowColor: C('#2b2a6e'), fogColorA: C('#16265c'), fogColorB: C('#2a1642'), fogNearRatio: - 0.2, fogFarRatio: 1.2 },
+    dawn:  { revealColor: C('#6b84ff'), revealIntensity: 7, lightColor: C('#ffb38c'), lightIntensity: 1.25, shadowColor: C('#b03a7a'), fogColorA: C('#ffc9a6'), fogColorB: C('#c58cff'), fogNearRatio: 0.3, fogFarRatio: 1.4 },
 }
 const KEYS = [ [ 'day', 0 ], [ 'day', 0.5 ], [ 'dusk', 0.6 ], [ 'night', 0.7 ], [ 'night', 0.82 ], [ 'dawn', 0.92 ], [ 'day', 1 ] ]
 
