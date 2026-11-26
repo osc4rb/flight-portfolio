@@ -30,12 +30,19 @@ export class Jet
     setModel()
     {
         const planes = (window.FlightParts || {}).planes || {}, def = planes[(this.game.site.aircraft || 'f35')] || planes[Object.keys(planes)[0]]
+        // our Blender jet (tools/blender-scripts/bake_models.py) is already in these metres, nose toward -z, on the
+        // same envelope as the planes.js airframe; planes.js stays as the fallback
+        const own = this.game.stage.models.jet
         let airframe
-        if(def) airframe = def.build(THREE).group
+        if(own) airframe = own.scene.clone(true)
+        else if(def) airframe = def.build(THREE).group
         else { airframe = new THREE.Mesh(new THREE.ConeGeometry(1, 12, 6).rotateX(- Math.PI / 2), new THREE.MeshLambertMaterial({ color: '#8a9097' })) }
-        const box = new THREE.Box3().setFromObject(airframe), size = box.getSize(new THREE.Vector3()), k = 12 / Math.max(size.z, 1)
-        airframe.scale.setScalar(k)
-        airframe.position.set(- (box.min.x + box.max.x) / 2 * k, - box.min.y * k, - (box.min.z + box.max.z) / 2 * k)
+        if(!own)
+        {
+            const box = new THREE.Box3().setFromObject(airframe), size = box.getSize(new THREE.Vector3()), k = 12 / Math.max(size.z, 1)
+            airframe.scale.setScalar(k)
+            airframe.position.set(- (box.min.x + box.max.x) / 2 * k, - box.min.y * k, - (box.min.z + box.max.z) / 2 * k)
+        }
         const holder = new THREE.Group(); holder.rotation.y = - Math.PI / 2; holder.add(airframe)   // model nose -z -> +x
         airframe.traverse(c => { if(c.isMesh) { c.castShadow = true } })
         this.model = new THREE.Group(); this.model.add(holder)

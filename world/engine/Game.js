@@ -25,6 +25,7 @@ import { Desk } from '../game/Desk.js'
 import { Achievements } from '../game/Achievements.js'
 import { Letters } from '../game/Letters.js'
 import { Sky } from '../game/Sky.js'
+import { Quests } from '../game/Quests.js'
 import { Stations } from '../game/Stations.js'
 import { Modes } from '../game/Modes.js'
 import { Hud } from '../game/Hud.js'
@@ -94,6 +95,7 @@ export class Game
         this.stage = new Stage()                   // respawns first: the view and player read them
         this.respawns = this.stage.respawns
         this.view = new View()
+        if(!this.debug.active) this.scene.remove(this.view.cameraHelper)   // his debug-only helper: NaN while the viewport has no size
         this.rendering.setPostprocessing()
         this.rendering.start()
         this.objects = new Objects()
@@ -125,6 +127,7 @@ export class Game
         this.grass.setMap()                        // again, now that the station houses stand
         this.ambience = new Ambience()
         this.modes = new Modes()
+        this.quests = new Quests()                 // messages from Oscar: one thing to do at a time
 
         progress(1, 'ready')
         this.modes.start()

@@ -304,7 +304,121 @@ def truck():
     export('truck')
 
 
+def slab(name, pts, thick, color):
+    """A flat polygon (list of (x, y, z)) given thickness along its normal: wings, fins, tails."""
+    bm = bmesh.new()
+    f = bm.faces.new([bm.verts.new(p) for p in pts])
+    r = bmesh.ops.extrude_face_region(bm, geom=[f])
+    nv = [e for e in r['geom'] if isinstance(e, bmesh.types.BMVert)]
+    n = f.normal.copy()
+    bmesh.ops.translate(bm, vec=n * thick, verts=nv)
+    bmesh.ops.translate(bm, vec=n * (-thick / 2), verts=list(bm.verts))
+    bmesh.ops.recalc_face_normals(bm, faces=bm.faces[:])
+    me = bpy.data.meshes.new(name); bm.to_mesh(me); bm.free()
+    o = bpy.data.objects.new(name, me); bpy.context.collection.objects.link(o)
+    return finish(o, color, name, 0.03, 2)
+
+
+# ------------------------------------------------------------------------------------------------ jet (Jet.js)
+def jet():
+    """Our jet, in the jet's own metres: Blender +Y is the jet's forward (+x in Jet.js), X its right side (+z), Z up
+    from the bottom of the fuselage (Jet.js lifts the model by the gear height). Same envelope as the planes.js
+    airframe it replaces (nose at +6, nozzle at -4.8, span 7.5, fin tips near 2.15), so flight and collision are
+    unchanged. Jet.js adds its own gear and afterburner flame."""
+    reset()
+    grey, dark, glass, metal, yellow = '#8a9097', '#4e545b', '#2a3b4a', '#3a3d42', '#f2c94c'
+    box('body', (2.0, 7.4, 0.95), (0, -0.6, 0.58), grey, 0.32, 4)
+    nose = cyl('nose', 0.62, 2.95, (0, 4.5, 0.6), grey, rot=(-math.pi / 2, 0, 0), verts=24, r2=0.06, bevel=0.0)
+    nose.scale = (1.15, 1, 0.85)
+    box('spine', (0.85, 3.4, 0.4), (0, 0.4, 1.0), grey, 0.18, 4)
+    sphere('canopy', 1, (0, 3.75, 1.0), glass, (0.34, 1.1, 0.3))
+    for s in (-1, 1):
+        box('intake', (0.55, 2.4, 0.8), (s * 0.85, 2.15, 0.5), grey, 0.14, 3)
+        box('intake-mouth', (0.42, 0.06, 0.62), (s * 0.85, 3.36, 0.5), dark, 0.02)
+        slab('wing', [(s * 0.7, 1.27, 0.55), (s * 3.7, -0.32, 0.55), (s * 3.7, -1.95, 0.55), (s * 0.7, -2.74, 0.55)], 0.14, grey)
+        slab('elevator', [(s * 0.55, -2.95, 0.62), (s * 2.31, -3.3, 0.62), (s * 2.31, -4.4, 0.62), (s * 0.55, -4.85, 0.62)], 0.1, grey)
+        fin = slab('fin', [(0, -2.0, 0.0), (0, -2.95, 1.4), (0, -4.2, 1.4), (0, -4.0, 0.0)], 0.1, grey)
+        fin.location = (s * 0.78, 0, 0.75); fin.rotation_euler.y = s * 0.35
+        tip = box('fintip', (0.12, 1.28, 0.16), (s * 1.27, -3.57, 2.12), yellow, 0.03)
+        tip.rotation_euler.y = s * 0.35
+        sphere('nav', 0.07, (s * 3.72, -0.87, 0.58), '#22ff55' if s > 0 else '#ff2a2a')
+    cyl('nozzle', 0.45, 0.75, (0, -4.42, 0.55), metal, rot=(math.pi / 2, 0, 0), verts=24, r2=0.4, bevel=0.03)
+    cyl('nozzle-hot', 0.32, 0.05, (0, -4.8, 0.55), '#5a2208', rot=(math.pi / 2, 0, 0), verts=24, bevel=0)
+    for o in bpy.context.scene.objects:
+        if o.type == 'MESH':
+            o.select_set(True); bpy.context.view_layer.objects.active = o
+            bpy.ops.object.transform_apply(location=True, rotation=True, scale=True); o.select_set(False)
+            densify(o, 0.3)
+    ground(-1.6)
+    bake_ao(0.6, 0.55)
+    export('jet')
+
+
+def half(o, z=0.0, keep_above=True):
+    """Cut a mesh with a horizontal plane, keeping one side."""
+    bm = bmesh.new(); bm.from_mesh(o.data)
+    bmesh.ops.bisect_plane(bm, geom=bm.verts[:] + bm.edges[:] + bm.faces[:], plane_co=(0, 0, z), plane_no=(0, 0, 1 if keep_above else -1), clear_inner=True)
+    bm.to_mesh(o.data); bm.free()
+
+
+# ------------------------------------------------------------------------------------------------ hangar (Stage.js garage)
+def garage():
+    """A Quonset hangar, open toward +Y (glTF -Z, toward the runway): an arched roof with ribs, a back wall, doors
+    slid half open with hazard stripes, an office annex, and crates and a workbench inside."""
+    reset()
+    wall, rib, door, stripe, floor, annex = '#cfd2d6', '#7d838a', '#5d636a', '#f2c94c', '#8d8d88', '#e8e2d4'
+    box('floor', (16.4, 12.4, 0.2), (0, 0, 0.1), floor, 0.05)
+
+    def shell(depth, y):
+        bpy.ops.mesh.primitive_cylinder_add(radius=8, depth=depth, vertices=48, location=(0, 0, 0), rotation=(math.pi / 2, 0, 0))
+        o = bpy.context.active_object
+        bpy.ops.object.transform_apply(location=False, rotation=True, scale=True)
+        half(o)
+        o.location = (0, y, 0); o.scale = (1, 1, 0.72)
+        return o
+
+    roof = shell(12, 0)
+    bm = bmesh.new(); bm.from_mesh(roof.data)
+    bmesh.ops.delete(bm, geom=[f for f in bm.faces if abs(f.normal.y) > 0.9 or f.normal.z < -0.9], context='FACES')   # open ends and floor
+    bm.to_mesh(roof.data); bm.free()
+    md = roof.modifiers.new('solid', 'SOLIDIFY'); md.thickness = 0.25
+    bpy.context.view_layer.objects.active = roof; bpy.ops.object.modifier_apply(modifier='solid')
+    finish(roof, wall, 'roof', 0.04, 2)
+    finish(shell(0.25, -6.0), wall, 'back', 0.04, 2)
+    gable = shell(0.25, 6.0)
+    half(gable, 4.9 / 0.72)                                     # only the part above the doors
+    finish(gable, wall, 'gable', 0.04, 2)
+    for y in (-5.9, -3.0, 0.0, 3.0, 5.9):
+        bpy.ops.mesh.primitive_torus_add(major_radius=8.12, minor_radius=0.12, major_segments=64, minor_segments=8, location=(0, 0, 0), rotation=(math.pi / 2, 0, 0))
+        t = bpy.context.active_object
+        bpy.ops.object.transform_apply(location=False, rotation=True, scale=True)
+        half(t)
+        t.location = (0, y, 0); t.scale = (1, 1, 0.72)
+        finish(t, rib, 'rib')
+    box('header', (16.2, 0.35, 0.45), (0, 6.05, 4.85), rib, 0.05)
+    for s in (-1, 1):
+        box('door', (3.7, 0.25, 4.6), (s * 6.0, 6.25, 2.5), door, 0.05)
+        box('stripe', (0.25, 0.27, 4.6), (s * 4.25, 6.26, 2.5), stripe, 0.02)
+        box('stripe', (3.7, 0.27, 0.25), (s * 6.0, 6.26, 0.4), stripe, 0.02)
+    box('annex', (3.0, 4.2, 3.0), (9.6, 3.6, 1.6), annex, 0.08)
+    box('annex-roof', (3.3, 4.5, 0.2), (9.6, 3.6, 3.15), rib, 0.04)
+    for y in (2.5, 4.5):
+        box('window', (0.06, 1.1, 0.9), (11.12, y, 1.9), '#33424d', 0.02)
+    box('annex-door', (1.0, 0.06, 2.0), (9.0, 5.72, 1.1), door, 0.02)
+    for i, (x, y, sz) in enumerate([(-5.5, -4.5, 1.2), (-4.2, -4.6, 1.0), (-5.4, -3.2, 0.9), (5.0, -4.2, 1.4), (5.6, -2.6, 0.8)]):
+        box('crate', (sz, sz, sz), (x, y, 0.2 + sz / 2), '#b9824f' if i % 2 else '#9c6b3f', 0.04)
+    box('workbench', (3.0, 0.8, 0.9), (0, -5.3, 0.65), rib, 0.04)
+    for o in bpy.context.scene.objects:
+        if o.type == 'MESH':
+            o.select_set(True); bpy.context.view_layer.objects.active = o
+            bpy.ops.object.transform_apply(location=False, rotation=True, scale=True); o.select_set(False)
+            densify(o, 0.6)
+    ground()
+    bake_ao(2.0, 0.45)
+    export('garage')
+
+
 only = sys.argv[sys.argv.index('--') + 2:] if '--' in sys.argv else []
-for fn in (desk, fountain, arch, truck):
+for fn in (desk, fountain, arch, truck, jet, garage):
     if not only or fn.__name__ in only:
         fn()

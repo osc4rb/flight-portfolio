@@ -85,6 +85,11 @@ kept read-only in `../vendor/folio-2025/` for reference.
     of it, or clicking it from the ground, pops the `site.js` contact links up in the HUD.
   - Easter egg: a small gold ring spins over the tallest peak; flying through it throws confetti.
   - His Cookie and Toilet areas have no flight version that makes sense, so they are left out.
+- `Quests.js`: seven steps told as messages from Oscar in a Messenger-style thread at the top left.
+  - It shows his GitHub avatar, a typing indicator, then each message.
+  - A tick marks a done step, and the next message follows.
+  - The words are in `site.js` → `world`. Each step ends when its achievement unlocks, and steps already done are
+    skipped.
 - `Letters.js`: the name from `site.js` in 3 m block letters by the airstrip, after his LandingArea letters. It uses
   our own 5×7 block font. Each letter is a sleeping Rapier body with one cuboid per run of blocks, so the truck or
   the walker can knock it over.
@@ -160,10 +165,14 @@ multiplies it in.
   keys, a mouse, a mug, a lamp, a plant and a chair
 - `fountain.glb` (0.4 MB): a stone basin with two tiers of bowls
 - `truck.glb` (0.7 MB): a pickup, with nodes `wheel-front-left` and so on for `CarVisual`
+- `jet.glb` (0.7 MB): our jet, built in the jet's own metres on the `planes.js` airframe's envelope. It loads at
+  scale 1, so flight and the collider are unchanged; `planes.js` is the fallback.
+- `garage.glb` (1.3 MB): a ribbed Quonset hangar with half-open doors, hazard stripes, an office annex, crates and a
+  workbench. It sits at 1:1, its doors at the runway's edge.
 - `arch.glb` (1.3 MB): a unit sea arch (radius 1, tube 0.2, legs thickened like `Course.js`'s collision shape),
   painted rock and moss, scaled to each arch
 
-They replace Kenney's fountain and truck. The desk and the arches fall back to the code-built versions if a
+They replace Kenney's fountain, truck and garage, and the `planes.js` jet. The desk and the arches fall back to the code-built versions if a
 file is missing.
 
 Nothing is downloaded into the repo. Trees, roads, terrain, the jets, the course rock and the desk are built in code.

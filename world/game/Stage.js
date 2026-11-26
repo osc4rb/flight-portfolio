@@ -38,12 +38,13 @@ const MODELS = {
     carB: KIT.kaykit + 'car_taxi.gltf',
     carC: KIT.kaykit + 'car_hatchback.gltf',
     carD: KIT.kaykit + 'car_stationwagon.gltf',
-    garage: KIT.city + 'building-garage.glb',
     // ours, built in Blender by tools/blender-scripts/bake_models.py (AO baked into vertex colours)
     fountain: 'models/fountain.glb',
     truck: 'models/truck.glb',
     desk: 'models/desk.glb',
     arch: 'models/arch.glb',
+    jet: 'models/jet.glb',
+    garage: 'models/garage.glb',
     tents: KIT.racing + 'decoration-tents.glb',
 }
 
@@ -276,7 +277,7 @@ export class Stage
         }
         this.place('fountain', 0, 0, { size: 9 })
         this.setStreet(spots)
-        this.place('garage', - 22, - 104, { size: 16, rotation: 0 })
+        this.place('garage', - 22, - 96.5, { size: 19.4, rotation: 0 })                           // our hangar with its annex, at 1:1, doors at the runway's edge
         this.place('tents', 24, - 98, { size: 18, collide: false })
     }
 
@@ -304,7 +305,7 @@ export class Stage
         }
         for(let k = 0; k < 10; k++) { const a = k / 10 * Math.PI * 2; spots.push([ Math.cos(a) * 17.5, Math.sin(a) * 17.5, 0.9 + R() * 0.4 ]) }
         const mat = new THREE.MeshLambertMaterial({ color: '#4f9a4a' }); mat.userData.foliage = true
-        const bushes = new THREE.InstancedMesh(bushGeometry(this.game.view.spherical.offset), mat, spots.length)
+        const bushes = new THREE.InstancedMesh(bushGeometry(this.cameraDirection()), mat, spots.length)
         const d = new THREE.Object3D(), c = new THREE.Color()
         spots.forEach(([ x, z, s ], i) => { d.position.set(x, height(x, z) - 0.15, z); d.scale.setScalar(s); d.updateMatrix(); bushes.setMatrixAt(i, d.matrix); bushes.setColorAt(i, c.setRGB(1, 1, 1).offsetHSL((R() - 0.5) * 0.06, 0, (R() - 0.5) * 0.1)) })
         bushes.castShadow = true; bushes.receiveShadow = true
@@ -326,7 +327,7 @@ export class Stage
         const trunk = new THREE.InstancedMesh(new THREE.CylinderGeometry(0.13, 0.24, 2.9, 7).translate(0, 1.45, 0), new THREE.MeshLambertMaterial({ color: '#7a4b37' }), spots.length)
         // crowns are leaf-card clouds (Foliage.js); Look gives them folio-2025's foliage material
         const crownMat = new THREE.MeshLambertMaterial({ color: '#4f9a4a' }); crownMat.userData.foliage = true
-        const crown = new THREE.InstancedMesh(crownGeometry(this.game.view.spherical.offset), crownMat, spots.length)
+        const crown = new THREE.InstancedMesh(crownGeometry(this.cameraDirection()), crownMat, spots.length)
         const d = new THREE.Object3D(), c = new THREE.Color()
         this.trees = { trunk, crown, list: [] }
         spots.forEach(([ x, z, s ], i) =>
@@ -342,6 +343,10 @@ export class Stage
         trunk.castShadow = crown.castShadow = true; crown.receiveShadow = true
         this.game.scene.add(trunk, crown)
     }
+    // the fixed camera's direction from its angles alone: the offset also holds a radius that is NaN while the
+    // viewport has no size (a hidden tab at load), which made every leaf card NaN
+    cameraDirection() { const s = this.game.view.spherical; return new THREE.Vector3().setFromSphericalCoords(1, s.phi, s.theta) }
+
     nearRoad(x, z, m)
     {
         const onRing = (Math.abs(Math.abs(x) - 40) < m && Math.abs(z) < 40 + m) || (Math.abs(Math.abs(z) - 40) < m && Math.abs(x) < 40 + m)

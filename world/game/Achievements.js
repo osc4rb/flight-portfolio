@@ -45,6 +45,7 @@ export class Achievements
         const g = this.game
         g.hud.achievements(this.list(), title)
         g.sound && g.sound.chime()
+        g.quests && g.quests.onUnlock(id)
         return true
     }
 

@@ -138,3 +138,21 @@ button{font:inherit;cursor:pointer}
 /* the blimp's links */
 .h-links{position:absolute;left:50%;top:150px;transform:translateX(-50%);display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
 .h-links.in{animation:rise .45s cubic-bezier(.34,1.56,.64,1)}
+
+/* quests: a Messenger-style thread at the top left */
+.h-msgs{position:absolute;left:14px;top:62px;width:min(300px,calc(100vw - 28px));display:flex;flex-direction:column;align-items:flex-start;gap:6px}
+.h-msghead{display:inline-flex;align-items:center;gap:8px;height:32px;padding:0 12px 0 5px;border:0;border-radius:999px;background:rgba(16,15,15,.78);color:var(--hi);font:600 13px var(--sys)}
+.h-msghead img{width:22px;height:22px;border-radius:50%;background:#2a2928}
+.h-unread{width:8px;height:8px;border-radius:50%;background:var(--ac)}
+.h-thread{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:5px}
+.h-msgs.closed .h-thread{display:none}
+.h-thread li{position:relative;max-width:100%;padding:8px 12px;border-radius:18px 18px 18px 6px;background:rgba(16,15,15,.86);color:var(--tx);font-size:13.5px;line-height:1.4;animation:rise .35s cubic-bezier(.34,1.56,.64,1)}
+.h-thread li.ok{color:var(--mu)}
+.h-thread li.ok::after{content:"✓";position:absolute;right:-6px;bottom:-6px;display:grid;place-items:center;width:18px;height:18px;border-radius:50%;background:var(--ac);color:#1d1704;font:700 11px var(--sys)}
+.h-thread li.last{border:1px solid var(--ac)}
+.h-thread li.typing{display:flex;gap:4px;padding:11px 12px}
+.h-thread li.typing span{width:6px;height:6px;border-radius:50%;background:var(--mu);animation:dot 1s infinite}
+.h-thread li.typing span:nth-child(2){animation-delay:.15s}
+.h-thread li.typing span:nth-child(3){animation-delay:.3s}
+@keyframes dot{0%,60%,100%{transform:none;opacity:.5}30%{transform:translateY(-3px);opacity:1}}
+@media (prefers-reduced-motion:reduce){.h-thread li,.h-thread li.typing span{animation:none}}

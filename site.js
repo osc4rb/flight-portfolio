@@ -187,6 +187,22 @@ window.FLIGHT_SITE = {
     ],
   },
 
+  // the 3D world's quests: messages from Oscar in the corner of the screen, one step at a time. Each step ends when
+  // its `goal` achievement unlocks (the ids are in world/game/Achievements.js).
+  world: {
+    from: "Oscar",
+    quests: [
+      { goal: "takeoff",  text: "Hey, welcome to my island! The jet is right behind you: walk up to it, press E, then hold W to take off." },
+      { goal: "lap",      text: "Nice. See the yellow ring over the runway? Fly through it to start a lap, then follow the gates round the mountains." },
+      { goal: "land",     text: "Good flying! Now bring it down on the runway: throttle back with B and keep the wings level." },
+      { goal: "computer", text: "There's a desk next to the runway. Walk up to it and press E: my résumé is on the screen." },
+      { goal: "people",   text: "Five people in town each hold one part of what I do. Go and say hi to all of them." },
+      { goal: "blimp",    text: "The blimp circling the island carries my links. Fly close and they pop up." },
+      { goal: "secret",   text: "Last one, if you like a challenge: a gold ring is hidden high above the island." },
+    ],
+    done: "That's everything. Thanks for flying by! The CV is always one click away, top right.",
+  },
+
   contact: {
     eyebrow: "DIRECT CONNECT",
     title: "Let's Build Something Extraordinary.",
