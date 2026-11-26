@@ -1,0 +1,140 @@
+/* world.css — the island's 2D layer. Same palette as the résumé page (Flexoki dark + our yellow) for panels. */
+:root{--bg:#100f0f;--tx:#cecdc3;--hi:#f2f0e5;--mu:#878580;--line:#282726;--ac:#f2c94c;
+  --sys:-apple-system,BlinkMacSystemFont,"Segoe UI","Helvetica Neue",Helvetica,Arial,sans-serif;--mono:ui-monospace,"Geist Mono",Consolas,monospace}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;overflow:hidden;background:#9fd2ec;font:15px/1.5 var(--sys);color:var(--hi);-webkit-font-smoothing:antialiased;touch-action:none}
+.game{position:fixed;inset:0}
+.js-canvas{position:absolute;inset:0;width:100%;height:100%;display:block;outline:none}
+kbd{display:inline-grid;place-items:center;min-width:22px;height:22px;padding:0 6px;border-radius:6px;background:var(--ac);color:#1d1704;font:700 12px var(--mono)}
+button{font:inherit;cursor:pointer}
+[hidden]{display:none!important}
+
+/* loader */
+.loader{position:fixed;inset:0;z-index:50;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;background:var(--bg);color:var(--tx);transition:opacity .6s}
+.loader.done{opacity:0;pointer-events:none}
+.l-name{margin:0;font:700 26px var(--sys);color:var(--hi)}
+.l-line{margin:6px 0 0;width:min(320px,70vw);height:3px;border-radius:3px;background:#282726;overflow:hidden}
+.l-line span{display:block;height:100%;width:0;background:var(--ac);transition:width .3s}
+.l-step{margin:0;font:13px var(--mono);color:var(--mu)}
+.l-back{margin-top:18px;color:var(--mu);font-size:14px}
+.loader.err .l-step{color:#ef8a6f;max-width:420px;text-align:center}
+
+/* hud */
+.hud{position:absolute;inset:0;pointer-events:none}
+.hud>*{pointer-events:auto}
+.h-top{position:absolute;top:14px;left:14px;right:14px;display:flex;gap:8px;align-items:center;pointer-events:none}
+.h-top>*{pointer-events:auto}
+.h-top .h-right{margin-left:auto}
+.h-cv{background:var(--ac);color:#1d1704}
+.h-cv:hover{background:#ffd95e}
+#h-help{margin-left:auto}
+.h-btn{display:inline-flex;align-items:center;gap:8px;height:38px;padding:0 14px;border:0;border-radius:999px;background:rgba(16,15,15,.78);color:var(--hi);font:600 14px var(--sys);text-decoration:none;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+.h-btn{transition:transform .35s cubic-bezier(.34,1.56,.64,1),background .2s}
+.h-btn:hover{background:rgba(16,15,15,.92);transform:translateY(-2px) scale(1.04)}
+.h-btn:active{transform:scale(.94);transition-duration:.08s}
+.h-btn.off{color:var(--mu)}
+.h-chip{height:38px;display:inline-flex;align-items:center;padding:0 14px;border-radius:999px;background:rgba(16,15,15,.78);color:var(--ac);font:700 14px var(--mono)}
+.h-chip.pop{animation:pop .4s}
+@keyframes pop{40%{transform:scale(1.18)}}
+.h-help{position:absolute;top:62px;right:14px;max-width:360px;padding:14px 16px;border-radius:14px;background:rgba(16,15,15,.86);color:var(--tx);font-size:14px;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+.h-help p{margin:0 0 6px}
+.h-help b{color:var(--hi)}
+.h-help .h-mute{margin:8px 0 0;color:var(--mu)}
+.h-prompt{position:absolute;left:50%;bottom:28px;transform:translateX(-50%);display:flex;align-items:center;gap:10px;height:46px;padding:0 18px 0 12px;border-radius:999px;background:rgba(16,15,15,.86);color:var(--hi);font:600 15px var(--sys);white-space:nowrap;cursor:pointer;transition:transform .3s cubic-bezier(.34,1.56,.64,1)}
+.h-prompt:hover{transform:translateX(-50%) scale(1.05)}
+.h-prompt:active{transform:translateX(-50%) scale(.95)}
+.h-prompt.pop{animation:rise .45s cubic-bezier(.34,1.56,.64,1)}
+.h-prompt kbd{animation:nudge 1.6s ease-in-out infinite}
+@keyframes rise{from{transform:translate(-50%,14px) scale(.8);opacity:0}}
+@keyframes nudge{0%,70%,100%{transform:none}80%{transform:translateY(-3px)}90%{transform:translateY(1px)}}
+
+/* speech bubble over a person (typed out by Hud.say) */
+.h-bubble{position:absolute;left:50%;top:40%;z-index:2;max-width:min(320px,80vw);padding:10px 14px;border-radius:16px;background:#fffdf5;color:#1d1b16;font:600 15px/1.4 var(--sys);box-shadow:0 8px 24px rgba(0,0,0,.18);border-bottom:3px solid var(--c,var(--ac));transform:translate(-50%,-100%) scale(0);transform-origin:50% 100%;opacity:0;pointer-events:none;transition:transform .2s ease-in,opacity .2s}
+.h-bubble::after{content:"";position:absolute;left:50%;bottom:-9px;width:16px;height:16px;background:#fffdf5;border-right:3px solid var(--c,var(--ac));border-bottom:3px solid var(--c,var(--ac));transform:translateX(-50%) rotate(45deg);border-radius:0 0 4px 0}
+.h-bubble.on{transform:translate(-50%,-100%) scale(1);opacity:1;transition:transform .45s cubic-bezier(.34,1.7,.64,1),opacity .15s}
+.h-bubble span{position:relative;z-index:1}
+.h-bubble span:empty::before{content:"…"}
+.h-flight{position:absolute;left:14px;bottom:20px;display:flex;gap:14px;padding:8px 14px;border-radius:12px;background:rgba(16,15,15,.72);font:13px var(--mono);color:var(--tx)}
+.h-flight b{color:var(--hi);font-size:16px}
+.h-race{position:absolute;left:50%;top:108px;transform:translateX(-50%);padding:7px 14px;border-radius:999px;background:rgba(16,15,15,.72);font:13px var(--mono);color:var(--tx);white-space:nowrap;pointer-events:none}
+.h-race b{color:var(--ac)}
+.h-mark{position:absolute;width:22px;height:22px;margin:-11px 0 0 -11px;border:3px solid var(--ac);border-radius:50%;pointer-events:none;box-shadow:0 0 0 2px rgba(16,15,15,.35)}
+.h-mark.edge{border-radius:0;border-width:0;width:0;height:0;margin:-12px 0 0 -12px;border-left:24px solid var(--ac);border-top:12px solid transparent;border-bottom:12px solid transparent;transform:rotate(var(--a))}
+.h-toast{position:absolute;left:50%;top:70px;transform:translate(-50%,-8px);padding:9px 16px;border-radius:999px;background:rgba(16,15,15,.88);color:var(--hi);font:600 14px var(--sys);opacity:0;transition:opacity .25s,transform .25s;pointer-events:none;max-width:calc(100vw - 32px);text-align:center}
+.h-toast.on{opacity:1;transform:translate(-50%,0);transition:opacity .2s,transform .45s cubic-bezier(.34,1.7,.64,1)}
+.h-toast.gold{background:var(--ac);color:#1d1704}
+
+/* résumé panel: the same list style as the résumé page */
+.h-panel{position:absolute;inset:0;display:grid;place-items:center;padding:16px;background:rgba(16,15,15,.35)}
+.h-panel[hidden]{display:none}
+.h-panel.in{animation:fade .25s}
+.h-panel.in .h-card{animation:card .5s cubic-bezier(.34,1.45,.64,1)}
+@keyframes fade{from{background:rgba(16,15,15,0)}}
+@keyframes card{from{transform:translateY(30px) scale(.9);opacity:0}}
+.h-card li{animation:item .45s cubic-bezier(.34,1.4,.64,1) both}
+.h-card li:nth-child(2){animation-delay:.04s}.h-card li:nth-child(3){animation-delay:.08s}.h-card li:nth-child(4){animation-delay:.12s}.h-card li:nth-child(5){animation-delay:.16s}.h-card li:nth-child(n+6){animation-delay:.2s}
+@keyframes item{from{transform:translateY(10px);opacity:0}}
+.h-x{transition:transform .3s cubic-bezier(.34,1.56,.64,1)}.h-x:hover{transform:rotate(90deg) scale(1.1)}
+.h-card{width:min(620px,100%);max-height:min(78vh,720px);overflow:auto;border-radius:18px;background:var(--bg);color:var(--tx);box-shadow:0 20px 60px rgba(0,0,0,.35);border-top:4px solid var(--c,var(--ac))}
+.h-card header{position:sticky;top:0;display:flex;justify-content:space-between;align-items:center;padding:18px 20px 10px;background:var(--bg)}
+.h-card h2{margin:0;font-size:22px;color:var(--hi)}
+.h-x{width:34px;height:34px;border:0;border-radius:50%;background:#1c1b1a;color:var(--hi);font-size:20px}
+.h-card ul{list-style:none;margin:0;padding:0 20px 8px}
+.h-card li{display:grid;grid-template-columns:96px 1fr;gap:0 14px;margin-top:12px;font-size:15px;line-height:1.55}
+.h-card li.sub{display:block;margin-top:18px;color:var(--mu);font-weight:700}
+.h-card .when{padding-top:2px;font:12.5px/1.5 var(--mono);color:var(--mu);white-space:nowrap}
+.h-card p{margin:0}
+.h-card b,.h-card strong{color:var(--hi);font-weight:600}
+.h-card a{color:inherit}
+.h-card footer{position:sticky;bottom:0;display:flex;justify-content:space-between;align-items:center;gap:10px;padding:14px 20px;background:var(--bg);border-top:1px solid var(--line);font-size:14px}
+.h-card footer a{color:var(--mu)}
+.h-card footer .h-btn{background:#1c1b1a}
+
+/* diagonal wipe (respawns, crashes) */
+.h-wipe{position:absolute;inset:-20%;background:var(--bg);transform:translateX(-120%) skewX(-18deg);transition:transform .38s cubic-bezier(.7,0,.3,1);pointer-events:none}
+.h-wipe.in{transform:translateX(0) skewX(-18deg)}
+
+/* folio-2025's touch buttons (shown in touch mode only) */
+.touch-buttons{position:absolute;right:16px;bottom:90px;display:none}
+.touch-buttons.is-active{display:block}
+.touch-buttons .list{display:flex;flex-direction:column;gap:10px}
+.touch-buttons .js-button{display:none;min-width:56px;height:56px;border:0;border-radius:999px;background:var(--ac);color:#1d1704;font:700 16px var(--sys)}
+.touch-buttons .js-button.is-visible{display:block}
+.touch-buttons .overlay{display:none}
+
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+@media (max-width:560px){
+  .h-card li{grid-template-columns:1fr}
+  .h-help{left:14px;right:14px;max-width:none}
+  .h-prompt{bottom:110px}
+}
+
+/* the computer inside the computer: the résumé page on the desk's screen (CSS3DRenderer) */
+.desk-css{position:absolute;inset:0;pointer-events:none}
+.desk-screen{background:#100f0f;transition:opacity .25s}
+.desk-screen iframe{display:block;width:100%;height:100%;border:0;background:#100f0f}
+.h-deskback{position:absolute;left:50%;bottom:22px;transform:translateX(-50%)}
+.h-deskback:hover{transform:translateX(-50%) translateY(-2px) scale(1.04)}
+
+/* achievements: count button, list, unlock slide-in */
+.h-achbox{position:absolute;top:62px;right:14px;width:min(320px,calc(100vw - 28px));max-height:calc(100vh - 140px);overflow:auto;padding:10px 14px;border-radius:14px;background:rgba(16,15,15,.9);color:var(--tx);font-size:13px}
+.h-achbox ul{list-style:none;margin:0;padding:0}
+.h-achbox li{display:flex;gap:10px;padding:6px 0;border-bottom:1px solid var(--line);color:var(--mu)}
+.h-achbox li:last-child{border:0}
+.h-achbox li span{color:var(--mu);font-size:15px}
+.h-achbox li p{margin:0}
+.h-achbox li b{display:block;color:var(--tx);font-weight:600}
+.h-achbox li.done span,.h-achbox li.done b{color:var(--ac)}
+.h-unlock{position:absolute;top:62px;right:14px;display:flex;gap:10px;align-items:center;padding:10px 16px;border-radius:14px;background:rgba(16,15,15,.9);border:1px solid var(--ac);transform:translateX(calc(100% + 40px));transition:transform .45s cubic-bezier(.34,1.56,.64,1);pointer-events:none}
+.h-unlock.on{transform:none}
+.h-unlock span{color:var(--ac);font-size:22px}
+.h-unlock p{margin:0;line-height:1.25}
+.h-unlock small{display:block;color:var(--mu);font:11px var(--mono);text-transform:uppercase;letter-spacing:.06em}
+.h-unlock b{color:var(--hi)}
+#h-ach.pop{animation:hpop .45s cubic-bezier(.34,1.56,.64,1)}
+@keyframes hpop{40%{transform:scale(1.18)}}
+@media (prefers-reduced-motion:reduce){.h-unlock{transition:none}}
+
+/* the blimp's links */
+.h-links{position:absolute;left:50%;top:150px;transform:translateX(-50%);display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.h-links.in{animation:rise .45s cubic-bezier(.34,1.56,.64,1)}

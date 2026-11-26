@@ -1,0 +1,8 @@
+# local only: agent notes, reference copies, tools
+AGENTS.md
+HANDOFF.md
+CLAUDE.md
+FLIGHT-GUIDE.md
+.claude/
+vendor/
+tools/blender/

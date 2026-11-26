@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Portfolio · Fly in</title>
+<meta name="description" content="Dive into a small island and fly to the work.">
+<meta name="theme-color" content="#100f0f">
+<link rel="icon" href="assets/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500&family=Bungee&family=Barlow+Condensed:wght@600;700;800&family=Barlow:ital,wght@0,500;0,600;0,700;1,500&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="flight.css">
+<script src="site.js"></script>
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+
+<!-- 1. Home page (also the CV): plain, instant; nothing 3D downloads until "Fly in" -->
+<div id="door" class="door"></div>
+
+<!-- 2. The world, revealed through the porthole -->
+<div id="world" class="world" hidden>
+  <canvas id="gl" aria-hidden="true"></canvas>
+  <canvas id="hudc" aria-hidden="true"></canvas>
+  <div id="flash" class="flash"></div>
+  <div id="ui" class="ui"></div>
+</div>
+
+<div id="map" class="map" hidden role="dialog" aria-modal="true" aria-label="Map"></div>
+<aside id="menu" class="menu" hidden role="dialog" aria-modal="true" aria-label="Menu"></aside>
+
+<div id="sheet" class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-title" hidden>
+  <div class="sheet-card">
+    <header class="sheet-head"><span id="sheet-kicker"></span><button type="button" class="x" id="sheet-x" aria-label="Close">×</button></header>
+    <div id="sheet-body" class="sheet-body"></div>
+    <div id="sheet-foot" class="sheet-foot"></div>
+  </div>
+</div>
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+<noscript><p style="padding:24px">This page needs JavaScript to show the portfolio.</p></noscript>
+<script src="planes.js"></script>
+<script src="landmarks.js"></script>
+<script src="hud.js"></script>
+<script src="physics.js"></script>
+<script src="nature.js"></script>
+<script src="flight.js"></script>
+</body>
+</html>

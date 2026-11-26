@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Oscar Basaula · World</title>
+<meta name="description" content="Walk, drive and fly around a small island that holds Oscar Basaula's résumé.">
+<meta name="theme-color" content="#9fd2ec">
+<link rel="icon" href="../assets/favicon.svg">
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="stylesheet" href="world.css">
+<!-- Engine: Bruno Simon's folio-2025 (MIT) run without a build step: these names are the ones his modules import. -->
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.187.0/build/three.webgpu.js",
+    "three/webgpu": "https://cdn.jsdelivr.net/npm/three@0.187.0/build/three.webgpu.js",
+    "three/tsl": "https://cdn.jsdelivr.net/npm/three@0.187.0/build/three.tsl.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.187.0/examples/jsm/",
+    "three/examples/jsm/": "https://cdn.jsdelivr.net/npm/three@0.187.0/examples/jsm/",
+    "three/src/math/MathUtils.js": "https://cdn.jsdelivr.net/npm/three@0.187.0/src/math/MathUtils.js",
+    "gsap": "https://cdn.jsdelivr.net/npm/gsap@3.15.1/+esm",
+    "camera-controls": "https://cdn.jsdelivr.net/npm/camera-controls@3.1.2/+esm",
+    "seedrandom": "https://cdn.jsdelivr.net/npm/seedrandom@3.0.5/+esm",
+    "normalize-wheel": "https://cdn.jsdelivr.net/npm/normalize-wheel@1.0.1/+esm",
+    "@dimforge/rapier3d-compat": "https://cdn.jsdelivr.net/npm/@dimforge/rapier3d-compat@0.19.3/rapier.mjs"
+  }
+}
+</script>
+<script src="../site.js"></script>
+<script src="../planes.js"></script>
+</head>
+<body>
+<div class="game">
+  <canvas class="js-canvas" aria-label="A small 3D island you can walk, drive and fly around"></canvas>
+
+  <!-- touch buttons, the element folio-2025's InteractiveButtons expects -->
+  <div class="js-touch-buttons touch-buttons">
+    <div class="js-overlay overlay"></div>
+    <div class="list">
+      <button type="button" data-name="interact" class="js-button interact">E</button>
+      <button type="button" data-name="unstuck" class="js-button unstuck">Unstuck</button>
+    </div>
+  </div>
+
+  <div class="hud" id="hud"></div>
+</div>
+
+<div class="loader" id="loader">
+  <p class="l-name"></p>
+  <p class="l-line"><span id="l-bar"></span></p>
+  <p class="l-step" id="l-step">Loading</p>
+  <a class="l-back" href="../index.html">← Back to the résumé</a>
+</div>
+
+<script type="module">
+  const bar = document.getElementById('l-bar'), step = document.getElementById('l-step'), loader = document.getElementById('loader');
+  document.querySelector('.l-name').textContent = (window.FLIGHT_SITE || {}).name || '';
+  const fail = (msg) => { step.textContent = msg; loader.classList.add('err'); };
+  if (!('gpu' in navigator) && !document.createElement('canvas').getContext('webgl2')) fail('This browser has no WebGPU or WebGL 2, so the 3D world cannot start.');
+  else {
+    try {
+      const { Game } = await import('./engine/Game.js');
+      const game = new Game({ onProgress: (k, what) => { bar.style.width = Math.round(k * 100) + '%'; step.textContent = what === 'ready' ? 'Ready' : 'Loading the ' + what; } });
+      if (/[?&]debug=1/.test(location.search)) window.game = game;
+      await game.ready;
+      loader.classList.add('done'); setTimeout(() => loader.remove(), 700);
+    } catch (e) {
+      console.error(e);
+      fail('The 3D world could not start here (offline, or the network blocks the CDN).');
+    }
+  }
+</script>
+</body>
+</html>
