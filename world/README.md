@@ -125,8 +125,10 @@ kept read-only in `../vendor/folio-2025/` for reference.
   - The words are in `site.js` → `world`. Each step ends when its achievement unlocks, and steps already done are
     skipped.
 - `Letters.js`: the name from `site.js` in 3 m block letters by the airstrip, after his LandingArea letters. It uses
-  our own 5×7 block font. Each letter is a sleeping Rapier body with one cuboid per run of blocks, so the truck or
-  the walker can knock it over.
+  our own 5×7 block font. Each letter is a sleeping Rapier body with one cuboid per run of blocks, lighter than the
+  truck (about 1.2 against 2.5), so the truck or the walker can knock it over. The jet is not a Rapier body: within
+  5 m it wakes a letter and throws it along its velocity, and the truck does the same within 2.8 m on top of the
+  contact itself.
 - `Desk.js`: the computer inside the computer, by the airstrip. A desk and monitor built from boxes, with a
   canvas picture of the résumé on the screen. E or a click glides the camera into the screen over 1.3 s (ease
   in-out, solved so the screen fills the view). Then the real page, `../index.html?plain=1`, fades in. It sits
