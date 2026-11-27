@@ -18,6 +18,7 @@ export const ACHIEVEMENTS = [
     [ 'people', 'Met everyone', 'Talk to all five people' ],
     [ 'coins', 'Coin collector', 'Pick up every coin' ],
     [ 'letters', 'Bowled over', 'Knock over a letter of the name' ],
+    [ 'crates', 'Kaboom', 'Set off an explosive crate' ],
     [ 'podium', 'Podium', 'Land and stop after a lap' ],
     [ 'blimp', 'Hello up there', 'Fly close to the blimp' ],
     [ 'secret', 'Crowned', 'Find the secret ring' ],

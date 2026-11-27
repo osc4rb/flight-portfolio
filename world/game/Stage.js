@@ -48,6 +48,7 @@ const MODELS = {
     room: 'models/room.glb',
     cabin: 'models/cabin.glb',
     doorway: 'models/doorway.glb',
+    crate: 'models/crate.glb',
     tents: KIT.racing + 'decoration-tents.glb',
 }
 

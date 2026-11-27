@@ -19,6 +19,7 @@ import { Player } from './Player.js'
 import { Stage } from '../game/Stage.js'
 import { CarVisual } from '../game/CarVisual.js'
 import { Tracks } from '../game/Tracks.js'
+import { Explosions } from '../game/Explosions.js'
 import { Walker } from '../game/Walker.js'
 import { Jet } from '../game/Jet.js'
 import { Course } from '../game/Course.js'
@@ -129,6 +130,7 @@ export class Game
         this.desk = new Desk()                     // the computer by the airstrip: the résumé on its screen
         this.room = new Room()                     // the cabin by the start, the room under the island, the doors to the other sites
         this.letters = new Letters()               // the name in big blocks you can knock over
+        this.explosions = new Explosions()         // explosive crates and fireballs (his Explosions, Fireballs, ExplosiveCrates)
         this.sky = new Sky()                       // the blimp with the links, and the secret ring
         this.look = new Look()                     // folio-2025's lighting, fog and materials, our colours
         this.look.convert()

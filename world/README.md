@@ -73,6 +73,11 @@ kept read-only in `../vendor/folio-2025/` for reference.
   - Boost draws two glowing trails from the back corners (his `Trails.js`).
   - Ours: headlights with beams and a pool of light on the ground, and a roof light bar. All of them glow at night
     (Look's `nightUniform`).
+- `Explosions.js`: his `Explosions.js`, `World/Fireballs.js` and `World/ExplosiveCrates.js`. Twenty crates in seven
+  spots (`SPOTS`), light sleeping Rapier boxes; a hit sets one off (a click, then the boom 0.4 s later). The fireball
+  throws every dynamic body in range, kicks the camera roll and bends the trees; his noise texture is replaced by
+  three's `mx_noise_float`. The jet and the robot set crates off by distance, and a jet crash is a fireball too. A
+  crate comes back 30 s later once you are 25 m away.
 - `Tracks.js`: his `Tracks.js` and `Trails.js`. Every wheel leaves a track in a 40 m render target that follows you; the
   grass shortens and the ground darkens there. Ours follows the player's height, since the island has hills.
 - `Jet.js`: the F-35/F-47 from `../planes.js` with arcade flight: takeoff, landing, crash, bail out, and a chase
@@ -207,6 +212,7 @@ multiplies it in.
 - `desk.glb` (1.0 MB): the desk, a drawer unit, the monitor with a `Screen` plane (1.6 × 0.9), a keyboard with
   keys, a mouse, a mug, a lamp, a plant and a chair
 - `fountain.glb` (0.4 MB): a stone basin with two tiers of bowls
+- `crate.glb` (0.2 MB): the explosive crate for `Explosions.js`, one mesh named `Crate`
 - `truck.glb` (1.1 MB): a lifted pickup in metres, with nodes `wheel-front-left` and so on, `headlight`, `lightbar`,
   `taillight`, `reverse`, `blinker-left` and `blinker-right` for `CarVisual`
 - `jet.glb` (0.7 MB): our jet, built in the jet's own metres on the `planes.js` airframe's envelope. It loads at

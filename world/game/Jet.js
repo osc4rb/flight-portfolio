@@ -228,7 +228,9 @@ export class Jet
         if(reason !== 'Respawn')
         {
             const j = this.game.juice, p = this.position.clone()
-            j.shake(0.9); this.game.sound.boom()
+            j.shake(0.9)
+            if(reason !== 'Splashdown' && this.game.explosions) this.game.explosions.fireball(p.clone().setY(Math.max(p.y, this.stage.height(p.x, p.z) + 1)), 7, 9)
+            else this.game.sound.boom()
             j.ring(p, 24, reason === 'Splashdown' ? '#e6f4fb' : '#9a948a', 9); j.dust(p, 14, { color: '#6d6a66', spread: 3, up: 4, size: 1.4, life: 1.4 }); j.sparkle(p, 24, '#ff9a3c')
         }
         this.game.view.roll.kick(3)

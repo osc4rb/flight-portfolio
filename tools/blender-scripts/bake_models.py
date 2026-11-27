@@ -653,7 +653,37 @@ def doorway():
     export('doorway')
 
 
+def crate():
+    """An explosive crate, 1 m, centred on its origin (Explosions.js gives it a 0.5 m cuboid collider): red boards, a
+    dark frame on every edge, and a yellow warning plate with a black triangle on two sides."""
+    reset()
+    red, frame, plate, ink = '#c8412d', '#4a2a1c', '#f2c94c', '#1d1c1b'
+    box('boards', (0.94, 0.94, 0.94), (0, 0, 0), red, 0.02)
+    for k in range(1, 4):                    # board seams
+        for s in (-1, 1):
+            box('seam', (0.95, 0.012, 0.012), (0, s * 0.471, -0.47 + k * 0.235), frame, 0)
+            box('seam', (0.012, 0.95, 0.012), (s * 0.471, 0, -0.47 + k * 0.235), frame, 0)
+    e = 0.5 - 0.06
+    for a in (-1, 1):
+        for b in (-1, 1):
+            box('edge', (1.0, 0.12, 0.12), (0, a * e, b * e), frame, 0.02)
+            box('edge', (0.12, 1.0, 0.12), (a * e, 0, b * e), frame, 0.02)
+            box('edge', (0.12, 0.12, 1.0), (a * e, b * e, 0), frame, 0.02)
+    for s in (-1, 1):
+        box('plate', (0.46, 0.02, 0.4), (0, s * 0.485, 0), plate, 0.01)
+        slab('mark', [(-0.15, s * 0.5, -0.12), (0.15, s * 0.5, -0.12), (0, s * 0.5, 0.15)], 0.012, ink)
+    for o in bpy.context.scene.objects:
+        if o.type == 'MESH':
+            o.select_set(True); bpy.context.view_layer.objects.active = o
+            bpy.ops.object.transform_apply(location=True, rotation=True, scale=True); o.select_set(False)
+            densify(o, 0.25)
+    ground(-0.5)
+    bake_ao(0.5, 0.5)
+    join([o for o in bpy.context.scene.objects if o.type == 'MESH' and not o.name.startswith('__')], 'Crate')
+    export('crate')
+
+
 only = sys.argv[sys.argv.index('--') + 2:] if '--' in sys.argv else []
-for fn in (desk, fountain, arch, truck, jet, garage, room, cabin, doorway):
+for fn in (desk, fountain, arch, truck, jet, garage, room, cabin, doorway, crate):
     if not only or fn.__name__ in only:
         fn()
