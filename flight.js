@@ -67,20 +67,23 @@
   function renderDoor(plain) {
     const V = S.home || {}, secs = V.sections || [], TB = V.tabs || {}, HR = V.hero || {}, HC = HR.cards || {};
     const links = (C.links || []).filter(l => l.href && !/^mailto:/.test(l.href)), ext = h => /^https?:/.test(h) ? ' target="_blank" rel="noopener"' : '';
+    // one entry, after silvjurado.com/cv: the year in the left column, the lead as the entry's title, the sentence under it
+    const lead = it => esc(String(it.lead || '').replace(/[.:]\s*$/, ''));
     const item = it => it.sub ? `<li class="sub"><h3>${esc(it.sub)}</h3></li>`
-      : `<li><span class="when">${esc(it.when || '')}</span><p>${it.href ? `<a href="${esc(it.href)}"${ext(it.href)}><b>${esc(it.lead || '')}</b></a>` : `<b>${esc(it.lead || '')}</b>`}${it.text ? ' ' + md(it.text) : ''}</p></li>`;
+      : `<li><span class="when">${esc(it.when || '')}</span><div class="ti"><h3>${it.href ? `<a href="${esc(it.href)}"${ext(it.href)}>${lead(it)}<span class="arw" aria-hidden="true">${/^https?:/.test(it.href) ? '↗' : '→'}</span></a>` : lead(it)}</h3>${it.text ? `<p>${md(it.text)}</p>` : ''}</div></li>`;
     const arrow = '<span class="arw" aria-hidden="true">→</span>';
     const cv = `<div class="rs" id="rs">
       <header class="rs-head">
+        <div class="rs-count" aria-hidden="true"><span>02<i> / 04</i></span><span class="hair"></span></div>
         <div class="rs-top"><h1>${esc(NAME)}</h1></div>
         ${V.lede ? `<p class="lede">${md(V.lede)}</p>` : ''}
-        <p class="contact">${C.email ? `<a href="mailto:${esc(C.email)}">${esc(C.email)}</a> <button type="button" class="link" data-copy>Copy</button>` : ''}
-          ${links.map(l => `<a href="${esc(l.href)}"${ext(l.href)}>${esc(l.label)}</a>`).join('')}<button type="button" class="link" data-pdf>${esc(V.pdf || 'Save as PDF')}</button></p>
+        <p class="contact">${C.email ? `<a class="cpill" href="mailto:${esc(C.email)}">${esc(C.email)}</a><button type="button" class="cpill" data-copy>Copy</button>` : ''}
+          ${links.map(l => `<a class="cpill" href="${esc(l.href)}"${ext(l.href)}>${esc(l.label)}</a>`).join('')}<button type="button" class="cpill" data-pdf>${esc(V.pdf || 'Save as PDF')}</button></p>
       </header>
       <nav class="rs-index" aria-label="Sections"><span class="idx">${secs.map(s => `<a href="#${esc(s.id)}">${esc(s.title)}</a>`).join('<i aria-hidden="true">·</i>')}</span>
         <label class="flt"><span class="vh">${esc(V.filter || 'Filter')}</span><input id="rs-filter" type="search" placeholder="${esc(V.filter || 'Filter')}" autocomplete="off" spellcheck="false"></label></nav>
       <p class="rs-none" id="rs-none" hidden>${esc(V.empty || 'Nothing matches.')} <button type="button" class="link" id="rs-clear">Clear the filter</button></p>
-      ${secs.map(s => `<section id="${esc(s.id)}" aria-labelledby="h-${esc(s.id)}"><h2 id="h-${esc(s.id)}">${esc(s.title)}</h2><ul class="items">${(s.items || []).map(item).join('')}</ul></section>`).join('')}
+      ${secs.map(s => `<section id="${esc(s.id)}" aria-labelledby="h-${esc(s.id)}"><div class="sh"><h2 id="h-${esc(s.id)}">${esc(s.title)}</h2><span class="hair" aria-hidden="true"></span></div><ul class="items tl">${(s.items || []).map(item).join('')}</ul></section>`).join('')}
     </div>`;
     const foot = (C.footer || []).length ? `<footer class="rs-foot">${C.footer.map(esc).join(' ')}</footer>` : '';
     if (plain) { door.innerHTML = `<main id="content" class="pane pane-cv">${cv}${foot}</main>`; wireCv(); return; }
