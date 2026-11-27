@@ -73,6 +73,10 @@ kept read-only in `../vendor/folio-2025/` for reference.
   - Boost draws two glowing trails from the back corners (his `Trails.js`).
   - Ours: headlights with beams and a pool of light on the ground, and a roof light bar. All of them glow at night
     (Look's `nightUniform`).
+- `JetLights.js`: his vehicle graphics fitted to the jet. Red and green wingtip lights, a double-flash strobe on the fin
+  tips and a red beacon; a landing light with a beam and a pool on the ground while the gear is down (night only).
+  White vapour trails from the wingtips when you pull hard above 45 m/s (his `Trails`). The main gear leaves tyre
+  tracks (his `Tracks`), touchdown puffs smoke, and flying low and fast kicks up dust, or spray over the sea.
 - `Explosions.js`: his `Explosions.js`, `World/Fireballs.js` and `World/ExplosiveCrates.js`. Twenty crates in seven
   spots (`SPOTS`), light sleeping Rapier boxes; a hit sets one off (a click, then the boom 0.4 s later). The fireball
   throws every dynamic body in range, kicks the camera roll and bends the trees; his noise texture is replaced by

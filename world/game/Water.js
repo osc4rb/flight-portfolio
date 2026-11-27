@@ -41,7 +41,7 @@ export class WaterSurface
     }
 
     // his detailsMask: 1 where the surface shows (shore edge and ripples), 0 where you look through
-    detailsMask()
+    detailsMask(edgeCovers = true)
     {
         return Fn(() =>
         {
@@ -54,21 +54,22 @@ export class WaterSurface
             const ripples = baseRipple.fract().sub(b.remap(0, 1, - 0.3, 1).oneMinus()).add(noise)
             const value = this.ripplesRatio.remap(0, 1, - 1, - 0.4).step(ripples).mul(b.greaterThan(0.005)).toVar()
             value.assign(max(value, this.shoreEdge.step(b)))
-            // past the terrain's edge there is nothing under the water to look at
-            const edge = max(abs(positionWorld.x), abs(positionWorld.z))
-            value.assign(max(value, smoothstep(195, 205, edge)))
+            // past the terrain's edge there is nothing under the water to look at (without the blur, the surface covers it)
+            if(edgeCovers) value.assign(max(value, smoothstep(185, 195, max(abs(positionWorld.x), abs(positionWorld.z)))))
             return value
         })()
     }
 
     setMaterial()
     {
-        // past the terrain's edge the surface takes the deep seabed's colour (Stage.js) instead of the surf's
-        const edge = smoothstep(195, 205, max(abs(positionWorld.x), abs(positionWorld.z)))
+        // toward the terrain's edge the water takes the deep seabed's colour (Stage.js), lit and fogged like the rest
+        const g = this.game, blurred = g.quality.level === 0
+        const edge = smoothstep(170, 195, max(abs(positionWorld.x), abs(positionWorld.z)))
+        const deepSeen = mix(this.deepColor.mul(this.throughTint), this.deepColor, 0.12)
         const material = new MeshDefaultMaterial({
             depthWrite: false,
-            colorNode: mix(this.surfaceColor, this.deepColor, edge),
-            alphaNode: this.detailsMask(),
+            colorNode: mix(this.surfaceColor, deepSeen, edge),
+            alphaNode: this.detailsMask(!blurred),
             alphaTest: 0,
             hasCoreShadows: false,
             hasDropShadows: true,
@@ -77,13 +78,15 @@ export class WaterSurface
         })
         material.isMeshDefault = true
         const baseOutput = material.outputNode
-        if(this.game.quality.level === 0)
+        if(blurred)
         {
             material.outputNode = Fn(() =>
             {
                 const blur = hashBlur(viewportSharedTexture(screenUV), 0.01, { repeats: 25, premultipliedAlpha: true })
                 // ours: what you see through the water is tinted toward the sea, so rock under the surface reads as under it
-                const seen = mix(vec3(blur).mul(this.throughTint), this.deepColor, 0.12)
+                const seen = mix(vec3(blur).mul(this.throughTint), this.deepColor, 0.12).toVar()
+                const flat = g.fog.strength.mix(deepSeen.mul(g.lighting.colorUniform).mul(g.lighting.intensityUniform), g.fog.color)
+                seen.assign(mix(seen, flat, edge))
                 return select(baseOutput.a.lessThan(0.5), vec4(seen, 1), vec4(baseOutput.rgb, 1))
             })()
         }

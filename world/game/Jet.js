@@ -3,6 +3,7 @@
    W pulls up, S pushes down, A/D bank and turn, Shift afterburner, B / Ctrl brake or throttle back. */
 import * as THREE from 'three/webgpu'
 import { Game } from '../engine/Game.js'
+import { JetLights } from './JetLights.js'
 
 const UP = new THREE.Vector3(0, 1, 0)
 
@@ -24,6 +25,7 @@ export class Jet
         this.setFx()
         this.setBody()
         this.park()
+        this.lights = new JetLights(this)          // his vehicle lights, trails, tracks and dust, fitted to the jet
         this.game.ticker.events.on('tick', () => this.update(), 2.6)
     }
 
