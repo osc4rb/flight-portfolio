@@ -138,9 +138,14 @@ export class Game
         this.perf = new Perf()                     // fewer pixels if the frame rate is low
         this.physicalVehicle.steeringAmplitude = 0.62   // his 0.5: the truck turns a little sharper
 
-        progress(1, 'ready')
         this.modes.start()
         this.reveal.mask()                         // the few materials that are not MeshDefaultMaterial
+        // compile every shader now, behind the loader, so nothing hitches the first time it comes into view
+        progress(0.95, 'shaders')
+        const t = performance.now()
+        try { await this.rendering.renderer.compileAsync(this.scene, this.view.camera) } catch(e) { console.warn('compile', e) }
+        this.compileMs = Math.round(performance.now() - t)
+        progress(1, 'ready')
         this.reveal.start(this.walker.position.clone().add({ x: - 2, y: 0, z: - 1.8 }))  // the disc: you, the desk and the jet's cockpit
     }
 }

@@ -406,7 +406,7 @@ export class Stage
     setClouds()
     {
         const R = rng(31)
-        for(let i = 0; i < 14; i++) { const a = R() * 6.28, r = 40 + R() * 140; const c = this.place('cloud', Math.cos(a) * r, Math.sin(a) * r, { size: 14 + R() * 12, collide: false, y: 34 + R() * 16 }); if(c) this.animated.push({ obj: c, drift: 0.6 + R() }) }
+        for(let i = 0; i < 14; i++) { const a = R() * 6.28, r = 40 + R() * 140; const c = this.place('cloud', Math.cos(a) * r, Math.sin(a) * r, { size: 14 + R() * 12, collide: false, y: 34 + R() * 16 }); if(c) { c.traverse(o => { o.castShadow = false }); this.animated.push({ obj: c, drift: 0.6 + R() }) } }   // no cloud shadows: they read as dark slabs
     }
 
     update()

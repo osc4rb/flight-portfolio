@@ -364,7 +364,7 @@ html.plain-mode body{background:#100f0f}
 .pg-h{margin:0;color:var(--r-hi);font-size:32px;line-height:1.1;font-weight:600;letter-spacing:-.02em}
 
 /* the panes on the front page, the project cards and the contact rows */
-.pns{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:44px}
+.pns{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:44px}
 .pcs{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:28px}
 .pn,.pc,.ct-row{position:relative;display:block;padding:22px 22px 24px;border:1px solid var(--r-line);border-radius:14px;background:var(--card);color:inherit;text-decoration:none;
   transition:border-color .2s,background-color .2s,box-shadow .2s,transform .2s}
@@ -374,12 +374,9 @@ html.plain-mode body{background:#100f0f}
 .arw{color:var(--r-mu);font-size:15px;transition:translate .2s}
 .pn b,.pc b{display:block;color:var(--r-hi);font-size:20px;font-weight:600;letter-spacing:-.01em}
 .pc p{margin:7px 0 0;font-size:14px;line-height:1.55;color:#9c9a94}
-.pn:hover,.pc:is(a):hover,.ct-row:is(a):hover,.pn:focus-visible,.pc:focus-visible,.ct-row:focus-visible{border-color:rgba(110,163,220,.55);background:var(--panel);box-shadow:var(--lift);outline:none}
+.pn:hover,.pc:is(a):hover,.ct-row:is(a):hover,.pn:focus-visible,.pc:focus-visible,.ct-row:focus-visible{border-color:rgba(159,178,255,.7);background:var(--panel);outline:none}
 .pn:hover .arw,.pc:hover .arw,.ct-row:hover .arw,.pn:focus-visible .arw{translate:4px 0;color:var(--r-hi)}
 /* Fly in: the same pane, lit */
-.pn-fly{border-color:rgba(110,163,220,.45);background:#0d1020}
-.pn-fly .arw{color:var(--ac2)}
-.pn-fly:hover{border-color:rgba(110,163,220,.85);box-shadow:0 18px 38px -16px rgba(63,118,196,.7)}
 .ct{display:grid;gap:10px;margin-top:28px;max-width:520px}
 .ct-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 20px}
 .ct-row>a{color:var(--r-hi);font-weight:600;text-decoration:none}
@@ -392,20 +389,20 @@ html.plain-mode body{background:#100f0f}
   [data-tilt]{transform:perspective(900px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg)) translateY(calc(var(--lift-y,0px) + var(--rise,0px)))}
   [data-tilt]:hover{--lift-y:-3px}
   [data-tilt].tilting{transition:border-color .2s,background-color .2s,box-shadow .2s}
-  [data-tilt]::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;background:radial-gradient(300px circle at var(--gx,50%) var(--gy,50%),rgba(170,200,240,.12),transparent 65%);opacity:var(--glare,0);transition:opacity .25s}
+  [data-tilt]::after{content:"";position:absolute;left:0;top:0;width:600px;height:600px;margin:-300px 0 0 -300px;border-radius:50%;pointer-events:none;background:radial-gradient(circle,rgba(170,200,240,.12),transparent 50%);transform:translate(var(--gxp,0px),var(--gyp,0px));opacity:var(--glare,0);transition:opacity .25s;will-change:transform,opacity}
+  [data-tilt]:hover{will-change:transform}
 }
 
 /* fade up */
 .fu{opacity:0;--rise:16px;transform:translateY(16px);transition:opacity .45s ease,transform .45s cubic-bezier(.22,1,.36,1)}
 .fu[data-tilt]{transform:perspective(900px) translateY(var(--rise))}
 .fu.in{opacity:1;--rise:0px;transform:none}
-.fu.in[data-tilt]{transform:perspective(900px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg)) translateY(calc(var(--lift-y,0px) + var(--rise,0px)));transition:opacity .6s ease,transform .6s cubic-bezier(.22,1,.36,1),border-color .2s,background-color .2s,box-shadow .2s}
+.fu.in[data-tilt]{transform:perspective(900px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg)) translateY(calc(var(--lift-y,0px) + var(--rise,0px)));transition:opacity .45s ease,transform .3s cubic-bezier(.22,1,.36,1),border-color .2s,background-color .2s}
 .fu.in[data-tilt].tilting{transition:border-color .2s,background-color .2s,box-shadow .2s}
 @media (prefers-reduced-motion:reduce){.fu,.fu[data-tilt],.fu.in[data-tilt]{opacity:1;transform:none;transition:none}}
 
 @media (max-width:900px){.pcs{grid-template-columns:repeat(2,1fr)}}
 @media (max-width:700px){
-  .pns{grid-template-columns:repeat(2,1fr)}
   .pcs{grid-template-columns:1fr}
   .hd-in,.pane,.pane-in,.hx-text,.door main>.rs-foot{padding-left:16px;padding-right:16px}
 }
@@ -428,12 +425,22 @@ html.plain-mode body{background:#100f0f}
   transition:transform .6s cubic-bezier(.22,1,.36,1),filter .6s;filter:saturate(.9) brightness(.85)}
 .pn-fly:hover .pn-img,.pn-fly:focus-visible .pn-img{transform:scale(1.06);filter:saturate(1.05) brightness(1)}
 
-/* one slow breath of colour when the pointer arrives, then it settles (about the pace of a sleep light) */
+/* the neon edge of the world's opening ring, on hover: one slow breath, then it settles. The glow is drawn once on its
+   own layer and only its opacity animates, so the hover stays smooth. */
+.pn,.pc,.ct-row,.hx-fly{position:relative}
+.pc,.ct-row{overflow:hidden}
+.pn::before,.pc:is(a)::before,.ct-row:is(a)::before,.hx-fly::before{content:"";position:absolute;inset:-1px;z-index:2;border-radius:inherit;border:1px solid #9fb2ff;pointer-events:none;
+  box-shadow:inset 0 0 14px rgba(95,125,255,.45);opacity:0;transition:opacity .3s;will-change:opacity}
+.pn,.pc:is(a),.ct-row:is(a),.hx-fly{transition:border-color .2s,background-color .2s,box-shadow .3s}
+.pn:hover,.pc:is(a):hover,.ct-row:is(a):hover,.hx-fly:hover{box-shadow:0 0 10px rgba(95,125,255,.6),0 0 28px rgba(95,125,255,.28)}
+.pn:focus-visible::before,.pc:focus-visible::before,.ct-row:focus-visible::before,.hx-fly:focus-visible::before{opacity:.8}
+@keyframes neon{0%{opacity:0}45%{opacity:1}100%{opacity:.75}}
 @keyframes breath-hue{0%{opacity:0}45%{opacity:1}100%{opacity:.7}}
-@keyframes breath-glow{0%{box-shadow:0 18px 38px -18px rgba(63,118,196,0)}45%{box-shadow:0 20px 44px -14px rgba(63,118,196,.7)}100%{box-shadow:var(--lift)}}
+@media (hover:hover){
+  .pn:hover::before,.pc:is(a):hover::before,.ct-row:is(a):hover::before,.hx-fly:hover::before{opacity:.75}
+}
 @media (hover:hover) and (prefers-reduced-motion:no-preference){
-  .pn:hover,.pc:is(a):hover,.ct-row:is(a):hover{animation:breath-glow 2.2s ease-in-out forwards}
-  .pn-fly:hover{--lift:0 18px 38px -16px rgba(63,118,196,.7)}
+  .pn:hover::before,.pc:is(a):hover::before,.ct-row:is(a):hover::before,.hx-fly:hover::before{animation:neon 2.2s ease-in-out forwards}
   [data-tilt]:hover::after{animation:breath-hue 2.2s ease-in-out forwards}
 }
 
@@ -459,7 +466,6 @@ html.plain-mode body{background:#100f0f}
 .hx-fly .arw{margin-left:10px;color:var(--ac2)}
 .hx-fly:hover,.hx-fly:focus-visible{border-color:var(--ac2);background:#1a2230;outline:none}
 .hx-fly:hover .arw,.hx-fly:focus-visible .arw{translate:4px 0;color:var(--r-hi)}
-@media (hover:hover) and (prefers-reduced-motion:no-preference){.hx-fly:hover{animation:breath-glow 2.2s ease-in-out forwards}}
 @media (max-width:640px){
   .hx{display:block;min-height:0;margin-top:0}
   .hx-img{position:relative;height:42vh;min-height:280px}
@@ -470,3 +476,4 @@ html.plain-mode body{background:#100f0f}
 }
 @media print{.hx{display:none}}
 @media (max-width:700px){.pane-in{padding-left:16px;padding-right:16px}}
+@media (max-width:560px){.pns{grid-template-columns:1fr}}

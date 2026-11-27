@@ -86,8 +86,8 @@
     if (plain) { door.innerHTML = `<main id="content" class="pane pane-cv">${cv}${foot}</main>`; wireCv(); return; }
 
     // the front page: the name, the lede, and four small panes; Fly in is the first and the highlighted one
-    const panes = TABS.map((t, i) => `<a class="pn fu${t === 'fly' ? ' pn-fly' : ''}" href="${t === 'fly' ? 'world/index.html' : '#' + t}" data-tilt>${t === 'fly' ? '<span class="pn-img" aria-hidden="true"></span>' : ''}
-        <span class="pn-top"><span class="pn-n">${t === 'fly' ? '' : String(i).padStart(2, '0')}</span><span class="arw" aria-hidden="true">→</span></span><b>${esc(TB[t] || t)}</b></a>`).join('');
+    const panes = TABS.filter(t => t !== 'fly').map((t, i) => `<a class="pn fu" href="#${t}" data-tilt>
+        <span class="pn-top"><span class="pn-n">${String(i + 1).padStart(2, '0')}</span><span class="arw" aria-hidden="true">→</span></span><b>${esc(TB[t] || t)}</b></a>`).join('');
     const proj = (V.projects || []).map(p => { const tag = p.href ? 'a' : 'article', at = p.href ? ` href="${esc(p.href)}"${ext(p.href)}` : '';
       return `<${tag} class="pc fu"${at} data-tilt><span class="pn-top"><span class="pn-n">${esc(p.tag || '')}</span>${p.href ? `<span class="arw" aria-hidden="true">${/^https?:/.test(p.href) ? '↗' : '→'}</span>` : ''}</span><b>${esc(p.title)}</b><p>${md(p.text || '')}</p></${tag}>`; }).join('');
     const contact = `<h2 class="pg-h fu">${esc(TB.contact || 'Contact')}</h2>
@@ -122,7 +122,7 @@
       let raf = 0;
       el.addEventListener('pointermove', e => { raf = raf || requestAnimationFrame(() => { raf = 0; const r = el.getBoundingClientRect(), x = (e.clientX - r.left) / r.width, y = (e.clientY - r.top) / r.height;
         el.classList.add('tilting'); el.style.setProperty('--rx', ((0.5 - y) * 9).toFixed(2) + 'deg'); el.style.setProperty('--ry', ((x - 0.5) * 9).toFixed(2) + 'deg');
-        el.style.setProperty('--gx', (x * 100).toFixed(1) + '%'); el.style.setProperty('--gy', (y * 100).toFixed(1) + '%'); el.style.setProperty('--glare', 1); }); });
+        el.style.setProperty('--gxp', (x * r.width).toFixed(1) + 'px'); el.style.setProperty('--gyp', (y * r.height).toFixed(1) + 'px'); el.style.setProperty('--glare', 1); }); });
       el.addEventListener('pointerleave', () => { cancelAnimationFrame(raf); raf = 0; el.classList.remove('tilting'); el.style.setProperty('--rx', '0deg'); el.style.setProperty('--ry', '0deg'); el.style.setProperty('--glare', 0); });
     });
     // tabs: #fly #cv #projects #contact, or any id inside the CV (a section) → the CV tab, scrolled there

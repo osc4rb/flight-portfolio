@@ -188,7 +188,7 @@ window.FLIGHT_SITE = {
         { when: "2024", lead: "National Merit Commended Scholar.", text: "Top 2–3% of about 1.5 million PSAT/NMSQT takers." },
         { when: "2024", lead: "USA Biology Olympiad, national top 50.", text: "Of about 12,000 competitors, on the open and semifinal exams." },
       ] },
-      { id: "life", title: "Outside class", say: ["British Parliamentary debate on the national circuit, and tutoring for the Wing.", "Twelve years of classical piano. Guitar now too.", "This summer: special-operations field training, then the Space Force's Azimuth program."],
+      { id: "life", title: "Outside the classroom", say: ["British Parliamentary debate on the national circuit, and tutoring for the Wing.", "Twelve years of classical piano. Guitar now too.", "This summer: special-operations field training, then the Space Force's Azimuth program."],
         items: [
         { when: "2025–now", lead: "USAFA Forensics.", text: "The Academy's nationally competitive speech and debate team. British Parliamentary debate at tournaments across the country." },
         { when: "2026–now", lead: "Wing Tutor.", text: "On the Wing roster for Computer Science 110, Chemistry 100, ECE, Law 220 and behavioral sciences: sessions before graded reviews, and a point of contact for questions." },
