@@ -174,9 +174,14 @@ kept read-only in `../vendor/folio-2025/` for reference.
   - ground meshes (terrain, roads, plaza, runway) shade with an up normal, like his floor: drop shadows only, no
     core shadow
   - roads and the plaza are procedural stone slabs
-  - the water follows his WaterSurface: depth from the baked terrain height sets its colour and see-through,
-    with a shore foam line and broken contour ripples; the seabed is coloured by depth in `Stage.setTerrain`
+  - every converted material has his white waterline where it crosses the sea (`hasWater`, not on the ground)
   - tree crowns thin out around the player on screen, as in his foliage
+- `Water.js`: his `Water.js` and `World/WaterSurface.js`. His details mask (the shore edge, and ripple rings rolling in
+  toward the beach) decides where the surface shows; everywhere else you look through it at a hash-blurred copy of the
+  seabed (`viewportSharedTexture`, quality 0 only). The depth comes from the terrain height in the grass map, his
+  noise textures are `mx_noise_float`, and the seabed is coloured by depth in `Stage.setTerrain`. Ours: the surf is a
+  pale sea colour, what you see through the water is tinted toward the sea, and past the terrain's edge the surface
+  is the deep sea's colour. His ice and rain splashes need his weather, which we don't have.
 - `Foliage.js`: a port of his `World/Foliage.js`. Tree crowns are three blobs of leaf cards with normals bent to
   the blob's sphere, a canvas-drawn leaf-cluster alpha, wind-turned cut-outs, and a lit/shadow side mix.
 - `Ambience.js` (ideas from his WindLines, Leaves, Flowers and PoleLights; the code is ours):

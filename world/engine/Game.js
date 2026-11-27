@@ -20,6 +20,7 @@ import { Stage } from '../game/Stage.js'
 import { CarVisual } from '../game/CarVisual.js'
 import { Tracks } from '../game/Tracks.js'
 import { Explosions } from '../game/Explosions.js'
+import { Water, WaterSurface } from '../game/Water.js'
 import { Walker } from '../game/Walker.js'
 import { Jet } from '../game/Jet.js'
 import { Course } from '../game/Course.js'
@@ -80,7 +81,7 @@ export class Game
         this.achievements = { setProgress: noop, addProgress: noop, groups: new Map() }
         this.tracks = { focusPoint: { set: noop } }
         this.dayCycles = { duration: 1e9 }
-        this.water = { surfaceElevation: - 0.4, depthElevation: - 25 }
+        this.water = new Water()                   // his Water.js: the surface height and the waterline uniforms
         this.world = { waterSurface: null }
         this.materials = { updateObject: noop }
         this.overlay = {
@@ -134,7 +135,7 @@ export class Game
         this.sky = new Sky()                       // the blimp with the links, and the secret ring
         this.look = new Look()                     // folio-2025's lighting, fog and materials, our colours
         this.look.convert()
-        this.stage.water.material = this.look.waterMaterial()
+        this.waterSurface = new WaterSurface()     // his WaterSurface: see-through shallows, ripples, the surface
         this.grass.mesh.material = this.look.grassMaterial(this.grass)
         this.stations = new Stations()
         this.grass.setMap()                        // again, now that the station houses stand

@@ -131,6 +131,7 @@ export class Look
             transparent: m.transparent,
             side: m.side,
             hasLightBounce: !mesh.userData.noBounce && !mesh.userData.ground,
+            hasWater: !mesh.userData.ground,                                          // his white waterline where things cross the surface
             // big rock (Course.js) leans its normals toward up, so whole mountainsides don't fall into core shadow
             normalNode: mesh.userData.ground ? vec3(0, 1, 0) : mesh.userData.softUp ? mix(normalWorld, vec3(0, 1, 0), float(mesh.userData.softUp)).normalize() : undefined,
         })
@@ -143,31 +144,6 @@ export class Look
         out.userData.ownGlow = true                                                 // Juice glows it in place
         this.cache.set(key, out)
         return out
-    }
-
-    // water, after folio-2025's WaterSurface: depth (surface minus the terrain height baked in the grass map) gives
-    // the colour and how see-through it is; a foam line hugs the shore and contour ripples roll out from it
-    waterMaterial()
-    {
-        const T = this.terrain, surface = this.game.water.surfaceElevation
-        const h = T.terrainNode(positionWorld.xz).r, depth = max(float(surface).sub(h), 0)
-        const shallow = color('#5fd3d0'), mid = color('#2a92c2'), deepC = color('#1a4f8f')
-        const base = mix(mix(shallow, mid, smoothstep(0.2, 1.6, depth)), deepC, smoothstep(1.6, 4.5, depth))
-        const shore = smoothstep(0.16, 0.05, depth)
-        const phase = depth.mul(2.6).sub(time.mul(0.25)), wave = fract(phase)
-        // each ripple ring is broken into dashes that drift along the shore
-        const dashes = sin(positionWorld.x.mul(0.37).add(positionWorld.z.mul(0.29)).add(phase.floor().mul(2.3)).add(time.mul(0.4))).mul(0.5).add(0.5)
-        const ripples = smoothstep(0.9, 0.93, wave).mul(smoothstep(0.95, 0.99, wave).oneMinus()).mul(smoothstep(1.5, 0.3, depth)).mul(smoothstep(0.45, 0.7, dashes)).mul(0.8)
-        const foam = max(shore, ripples)
-        const W = this.water = { foam: uniform(color('#ffffff')) }
-        const m = new MeshDefaultMaterial({
-            colorNode: mix(base, W.foam, foam),
-            alphaNode: max(smoothstep(0.02, 1.4, depth).mul(0.82), foam),
-            alphaTest: 0, transparent: true, depthWrite: false,
-            hasCoreShadows: false, hasDropShadows: true, hasLightBounce: false,
-        })
-        m.isMeshDefault = true
-        return m
     }
 
     // stone slabs in staggered rows: darker gaps, each slab a little lighter or darker (paths and the plaza)
