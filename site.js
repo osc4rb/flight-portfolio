@@ -216,7 +216,10 @@ window.FLIGHT_SITE = {
     // the race (world/game/Course.js, Leaderboard.js). leaderboard: the Supabase project URL and its public anon key;
     // empty = times stay on each visitor's device
     race: { board: "Fastest laps", yourLap: "Your lap", name: "Your name", post: "Post", posted: "Posted", close: "Close" },
-    leaderboard: { url: "", key: "" },
+    leaderboard: {
+      url: "https://uvxdpivsouktdstdbtjq.supabase.co",
+      key: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV2eGRwaXZzb3VrdGRzdGRidGpxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTU3MzY0MDYsImV4cCI6MjExMTMxMjQwNn0.7LMBlol7leZ6_Wvj49za8iyVlC6KK7Cnb4oOfPgz9VQ",
+    },
     // doors (world/game/Room.js): walk up and a sign shows `tab`, `name` and `go`; `label` floats over the door.
     // The one without href is the cabin by the start: it leads into the room. The others open those sites.
     doors: [
