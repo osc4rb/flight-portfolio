@@ -10,7 +10,8 @@ const COLORS = [ '#f2c94c', '#5fb3cf', '#9fe0b7', '#ef8a6f', '#b9a6ff' ]
 const VOICES = [ 1.25, 0.85, 1.45, 1.05, 1.6 ]           // talk-blip pitch per person
 const TALK = 9                                              // m: inside this a person turns to you and talks
 
-function label(text, color)
+// a dark pill with a coloured dot and the name, as a sprite (Places.js uses it too)
+export function label(text, color)
 {
     const c = document.createElement('canvas'), g = c.getContext('2d'), font = '600 64px system-ui, -apple-system, Segoe UI, sans-serif'
     g.font = font; const w = Math.ceil(g.measureText(text).width) + 90; c.width = w; c.height = 112

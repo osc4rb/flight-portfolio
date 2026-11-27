@@ -159,3 +159,39 @@ button{font:inherit;cursor:pointer}
 .h-thread li.typing span:nth-child(3){animation-delay:.3s}
 @keyframes dot{0%,60%,100%{transform:none;opacity:.5}30%{transform:translateY(-3px);opacity:1}}
 @media (prefers-reduced-motion:reduce){.h-thread li,.h-thread li.typing span{animation:none}}
+
+/* wayfinding (Places.js, Map.js): the top-right Map button, the quest arrow and the island map */
+.h-mapbtn kbd{min-width:20px;height:20px;margin-left:-4px;font-size:11px}
+.h-cv{box-shadow:0 0 0 2px rgba(16,15,15,.25)}
+.h-qmark{border-color:var(--c,var(--ac));animation:qpulse 1.6s ease-in-out infinite}
+.h-qmark.edge{margin:-17px 0 0 -17px;border-left:34px solid var(--c,var(--ac));border-top:17px solid transparent;border-bottom:17px solid transparent;filter:drop-shadow(0 0 2px rgba(16,15,15,.9)) drop-shadow(0 2px 6px rgba(0,0,0,.4));animation:none}
+@keyframes qpulse{50%{transform:scale(1.25)}}
+.h-map{position:absolute;inset:0;z-index:5;display:grid;place-items:center;padding:16px;background:rgba(16,15,15,.45)}
+.h-map.in{animation:fade .25s}
+.h-map.in .m-card{animation:card .5s cubic-bezier(.34,1.45,.64,1)}
+.m-card{width:min(620px,100%,calc(100vh - 32px));border-radius:18px;background:var(--bg);color:var(--tx);box-shadow:0 20px 60px rgba(0,0,0,.35);border-top:4px solid var(--ac);overflow:hidden}
+.m-card header{display:flex;align-items:center;gap:12px;padding:14px 16px 10px 20px}
+.m-card h2{margin:0;font-size:20px;color:var(--hi)}
+.m-hint{margin:0 auto 0 0;color:var(--mu);font-size:13.5px}
+.m-box{position:relative;aspect-ratio:1;max-height:calc(100vh - 110px);margin:0 auto}
+.m-box canvas{display:block;width:100%;height:100%;image-rendering:auto}
+.m-pins{position:absolute;inset:0}
+.m-pin{position:absolute;display:flex;align-items:center;gap:6px;padding:4px 10px 4px 6px;border:0;border-radius:999px;background:rgba(16,15,15,.86);color:var(--hi);font:600 12.5px var(--sys);white-space:nowrap;transform:translate(-14px,-50%);transition:transform .3s cubic-bezier(.34,1.56,.64,1),background .2s}
+.m-pin i{width:12px;height:12px;border-radius:50%;background:var(--c);box-shadow:0 0 0 2px rgba(255,255,255,.85)}
+.m-pin:not(:disabled):hover,.m-pin:not(:disabled):focus-visible{z-index:2000!important;background:#000;transform:translate(-14px,-50%) scale(1.12)}
+.m-pin:disabled{cursor:default;opacity:.85}
+.m-pin.left{flex-direction:row-reverse;padding:4px 6px 4px 10px;transform:translate(calc(14px - 100%),-50%)}
+.m-pin.left:not(:disabled):hover,.m-pin.left:not(:disabled):focus-visible{transform:translate(calc(14px - 100%),-50%) scale(1.12)}
+.m-you{position:absolute;width:0;height:0;margin:-8px 0 0 -6px;border-left:18px solid #fff;border-top:8px solid transparent;border-bottom:8px solid transparent;transform-origin:6px 8px;transform:rotate(var(--a,0rad));filter:drop-shadow(0 1px 2px rgba(0,0,0,.6));pointer-events:none;z-index:1500}
+@media (max-width:560px){
+  .h-top{gap:6px}
+  #h-help,.h-mapbtn kbd{display:none}
+  .h-btn{padding:0 11px;font-size:13px}
+  .m-pin span{font-size:11px}
+}
+
+/* icon buttons (sound, controls): fewer words at the top */
+.h-ico{width:38px;padding:0;justify-content:center;font-size:16px}
+#h-sound .x{display:none}
+#h-sound.off .x{display:inline}
+#h-sound.off .w{display:none}

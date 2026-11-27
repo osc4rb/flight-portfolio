@@ -35,6 +35,9 @@ import { Grass } from '../game/Grass.js'
 import { Look } from '../game/Look.js'
 import { Ambience } from '../game/Ambience.js'
 import { Reveal } from '../game/Reveal.js'
+import { Places } from '../game/Places.js'
+import { IslandMap } from '../game/Map.js'
+import { Perf } from '../game/Perf.js'
 
 const noop = () => {}
 const sound = { play: noop, playRandomNext: noop, stop: noop, volume: 0 }
@@ -130,10 +133,14 @@ export class Game
         this.ambience = new Ambience()
         this.modes = new Modes()
         this.quests = new Quests()                 // messages from Oscar: one thing to do at a time
+        this.places = new Places()                 // labels over the places, and an arrow toward the current quest
+        this.map = new IslandMap()                 // M: the island from above; click a place to go there
+        this.perf = new Perf()                     // fewer pixels if the frame rate is low
+        this.physicalVehicle.steeringAmplitude = 0.62   // his 0.5: the truck turns a little sharper
 
         progress(1, 'ready')
         this.modes.start()
         this.reveal.mask()                         // the few materials that are not MeshDefaultMaterial
-        this.reveal.start(this.walker.position)    // the disc opens where you stand, beside the jet
+        this.reveal.start(this.walker.position.clone().add({ x: - 2, y: 0, z: - 1.8 }))  // the disc: you, the desk and the jet's cockpit
     }
 }

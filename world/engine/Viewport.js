@@ -21,7 +21,7 @@ export class Viewport
         this.ratio = this.width / this.height
 
         this.pixelRatioPure = window.devicePixelRatio
-        this.pixelRatioMax = 2
+        this.pixelRatioMax = 1.5 // [world patch] his max is 2; Perf.js lowers it further on slow GPUs
         this.pixelRatio = Math.min(this.pixelRatioPure, this.pixelRatioMax)
     }
 

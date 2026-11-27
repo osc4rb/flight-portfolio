@@ -172,6 +172,7 @@ export class Stage
     // ---------------------------------------------------------------- roads: flat ribbons hugging the ground
     ribbon(points, width, color, lift = 0.06)
     {
+        (this.roads = this.roads || []).push({ points, width })     // Map.js draws them
         const P = [], I = []
         for(let k = 0; k < points.length; k++)
         {

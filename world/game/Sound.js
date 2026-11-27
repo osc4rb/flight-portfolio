@@ -19,7 +19,7 @@ export class Sound
         const start = () => this.start()
         addEventListener('pointerdown', start, { once: false, capture: true })
         addEventListener('keydown', start, { once: false, capture: true })
-        addEventListener('keydown', e => { if(e.code === 'KeyM' && !e.repeat && !/input|textarea/i.test(e.target.tagName)) this.toggle() })
+        addEventListener('keydown', e => { if(e.code === 'KeyN' && !e.repeat && !/input|textarea/i.test(e.target.tagName)) this.toggle() })
         this.game.ticker.events.on('tick', () => this.update(), 9.5)
     }
 

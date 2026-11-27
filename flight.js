@@ -59,32 +59,92 @@
 
   // =================================================================== front door
   const JET = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l1.6 6.5 7.4 5.5v1.8l-7.2-2.6-.5 5 2.4 2v1.4L12 20.6l-3.7 1v-1.4l2.4-2-.5-5L3 15.8V14l7.4-5.5z"/></svg>';
-  // the home page is the résumé: one dark column after husam.world/facts (section index with a filter, copy email,
-  // save as PDF, one line per item), henrp-style monospace dates. "Fly in" keeps the porthole the world dives out of.
+  // the home page (2026-11-25): tabs, cards and hovers after silvjurado.com, kept black. Fly in is the front page and
+  // the biggest thing on it; CV is the résumé (one column after husam.world/facts, henrp-style dates); Projects and
+  // Contact come from site.js → home. The tabs are hash routes, so links like index.html#research open the CV there.
+  // ?plain=1 (the desk's screen in the world) shows the CV alone.
+  const TABS = ['fly', 'cv', 'projects', 'contact'];
   function renderDoor(plain) {
-    const V = S.home || {}, secs = V.sections || [];
+    const V = S.home || {}, secs = V.sections || [], TB = V.tabs || {}, HR = V.hero || {}, HC = HR.cards || {};
     const links = (C.links || []).filter(l => l.href && !/^mailto:/.test(l.href)), ext = h => /^https?:/.test(h) ? ' target="_blank" rel="noopener"' : '';
     const item = it => it.sub ? `<li class="sub"><h3>${esc(it.sub)}</h3></li>`
       : `<li><span class="when">${esc(it.when || '')}</span><p>${it.href ? `<a href="${esc(it.href)}"${ext(it.href)}><b>${esc(it.lead || '')}</b></a>` : `<b>${esc(it.lead || '')}</b>`}${it.text ? ' ' + md(it.text) : ''}</p></li>`;
-    const port = `<span class="port" id="port">${JET}<i></i><i></i><span class="ring"></span></span>`, label = esc(V.play || DOOR.fly || 'Fly in');
-    // the 3D world is world/index.html (folio-2025 engine); the old flight sim still answers ?fly=1
-    const fly = `<a class="fly" href="world/index.html">${port}<span>${label}</span></a>`;
-    door.innerHTML = `<main id="content" class="rs">
+    const arrow = '<span class="arw" aria-hidden="true">→</span>';
+    const cv = `<div class="rs" id="rs">
       <header class="rs-head">
-        <div class="rs-top"><h1>${esc(NAME)}</h1>${fly}</div>
+        <div class="rs-top"><h1>${esc(NAME)}</h1></div>
         ${V.lede ? `<p class="lede">${md(V.lede)}</p>` : ''}
-        <p class="contact">${C.email ? `<a href="mailto:${esc(C.email)}">${esc(C.email)}</a> <button type="button" class="link" id="rs-copy">Copy</button>` : ''}
-          ${links.map(l => `<a href="${esc(l.href)}"${ext(l.href)}>${esc(l.label)}</a>`).join('')}<button type="button" class="link" id="rs-pdf">${esc(V.pdf || 'Save as PDF')}</button></p>
-        ${V.playNote ? `<p class="note">✈ ${esc(V.playNote)}</p>` : ''}
+        <p class="contact">${C.email ? `<a href="mailto:${esc(C.email)}">${esc(C.email)}</a> <button type="button" class="link" data-copy>Copy</button>` : ''}
+          ${links.map(l => `<a href="${esc(l.href)}"${ext(l.href)}>${esc(l.label)}</a>`).join('')}<button type="button" class="link" data-pdf>${esc(V.pdf || 'Save as PDF')}</button></p>
       </header>
       <nav class="rs-index" aria-label="Sections"><span class="idx">${secs.map(s => `<a href="#${esc(s.id)}">${esc(s.title)}</a>`).join('<i aria-hidden="true">·</i>')}</span>
         <label class="flt"><span class="vh">${esc(V.filter || 'Filter')}</span><input id="rs-filter" type="search" placeholder="${esc(V.filter || 'Filter')}" autocomplete="off" spellcheck="false"></label></nav>
       <p class="rs-none" id="rs-none" hidden>${esc(V.empty || 'Nothing matches.')} <button type="button" class="link" id="rs-clear">Clear the filter</button></p>
       ${secs.map(s => `<section id="${esc(s.id)}" aria-labelledby="h-${esc(s.id)}"><h2 id="h-${esc(s.id)}">${esc(s.title)}</h2><ul class="items">${(s.items || []).map(item).join('')}</ul></section>`).join('')}
-      ${(C.footer || []).length ? `<footer class="rs-foot">${C.footer.map(esc).join(' ')}</footer>` : ''}
-    </main>`;
-    const cp = $('#rs-copy'); if (cp) cp.addEventListener('click', () => copy(C.email));
-    $('#rs-pdf').addEventListener('click', () => print());
+    </div>`;
+    const foot = (C.footer || []).length ? `<footer class="rs-foot">${C.footer.map(esc).join(' ')}</footer>` : '';
+    if (plain) { door.innerHTML = `<main id="content" class="pane pane-cv">${cv}${foot}</main>`; wireCv(); return; }
+
+    // the front page: the name, the lede, and four small panes; Fly in is the first and the highlighted one
+    const panes = TABS.map((t, i) => `<a class="pn fu${t === 'fly' ? ' pn-fly' : ''}" href="${t === 'fly' ? 'world/index.html' : '#' + t}" data-tilt>${t === 'fly' ? '<span class="pn-img" aria-hidden="true"></span>' : ''}
+        <span class="pn-top"><span class="pn-n">${t === 'fly' ? '' : String(i).padStart(2, '0')}</span><span class="arw" aria-hidden="true">→</span></span><b>${esc(TB[t] || t)}</b></a>`).join('');
+    const proj = (V.projects || []).map(p => { const tag = p.href ? 'a' : 'article', at = p.href ? ` href="${esc(p.href)}"${ext(p.href)}` : '';
+      return `<${tag} class="pc fu"${at} data-tilt><span class="pn-top"><span class="pn-n">${esc(p.tag || '')}</span>${p.href ? `<span class="arw" aria-hidden="true">${/^https?:/.test(p.href) ? '↗' : '→'}</span>` : ''}</span><b>${esc(p.title)}</b><p>${md(p.text || '')}</p></${tag}>`; }).join('');
+    const contact = `<h2 class="pg-h fu">${esc(TB.contact || 'Contact')}</h2>
+      <div class="ct">${C.email ? `<div class="ct-row fu"><a href="mailto:${esc(C.email)}">${esc(C.email)}</a><button type="button" class="pill" data-copy>${esc(C.copyLabel || 'Copy')}</button></div>` : ''}
+        ${links.map(l => `<a class="ct-row fu" href="${esc(l.href)}"${ext(l.href)} data-tilt><b>${esc(l.label)}</b><span class="arw" aria-hidden="true">↗</span></a>`).join('')}</div>`;
+
+    door.innerHTML = `<header class="hd is-top"><div class="hd-in"><a class="hd-name" href="#fly">${esc(NAME)}</a>
+        <nav class="hd-tabs" aria-label="Pages"><span class="tab-pill" aria-hidden="true"></span>${TABS.map(t => `<a href="#${t}" data-tab="${t}">${esc(TB[t] || t)}</a>`).join('')}</nav></div></header>
+      <main id="content">
+        <section class="pane pane-fly" data-pane="fly" aria-label="${esc(TB.fly || 'Fly in')}">
+          <div class="hx"><a class="hx-img" href="world/index.html" tabindex="-1" aria-hidden="true"><img src="assets/world-hero.webp" alt="" width="2200" height="1100" fetchpriority="high" decoding="async"></a>
+            <div class="hx-text"><h1 class="hero-h fu">${esc(NAME)}</h1>${V.lede ? `<p class="hero-l fu">${md(V.lede)}</p>` : ''}<a class="hx-fly fu" href="world/index.html">${esc(TB.fly || 'Fly in')}<span class="arw" aria-hidden="true">→</span></a></div></div>
+          <div class="pane-in"><div class="pns">${panes}</div></div></section>
+        <section class="pane pane-cv" data-pane="cv" aria-label="${esc(TB.cv || 'CV')}" hidden>${cv}</section>
+        <section class="pane" data-pane="projects" aria-label="${esc(TB.projects || 'Projects')}" hidden><h2 class="pg-h fu">${esc(TB.projects || 'Projects')}</h2><div class="pcs">${proj}</div></section>
+        <section class="pane" data-pane="contact" aria-label="${esc(TB.contact || 'Contact')}" hidden>${contact}</section>
+        ${foot}
+      </main>`;
+    wireCv();
+    const hd = door.querySelector('.hd'), pill = door.querySelector('.tab-pill');
+    // fade up as things come into view; the header stays clear at the top and tints once you scroll (Jurado's)
+    const io = 'IntersectionObserver' in window ? new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }), { rootMargin: '0px 0px -8% 0px', threshold: 0.08 }) : null;
+    const reveal = () => door.querySelectorAll('.pane:not([hidden]) .fu:not(.in)').forEach((el, i) => { el.style.transitionDelay = Math.min(i, 6) * 45 + 'ms'; io ? io.observe(el) : el.classList.add('in'); });
+    const hxImg = door.querySelector('.hx-img img'); let hxRaf = 0;
+    const top = () => { hd.classList.toggle('is-top', scrollY <= 8);
+      if (hxImg && !RM_OS && !hxRaf) hxRaf = requestAnimationFrame(() => { hxRaf = 0; const y = Math.min(scrollY, 800); hxImg.style.transform = `translateY(${(y * 0.18).toFixed(1)}px) scale(${(1 + y * 0.00025).toFixed(4)})`; }); };
+    addEventListener('scroll', top, { passive: true });
+    // the pill behind the current tab slides to the new one
+    const place = (a, still) => { if (!a) return; if (still) pill.style.transition = 'none'; pill.style.width = a.offsetWidth + 'px'; pill.style.transform = `translateX(${a.offsetLeft}px)`; if (still) { void pill.offsetWidth; pill.style.transition = ''; } };
+    // cards lean toward the pointer, lift and catch a soft glare (Jurado's: 4.5° at the edges)
+    if (matchMedia('(hover: hover) and (pointer: fine)').matches && !RM_OS && !RM()) door.querySelectorAll('[data-tilt]').forEach(el => {
+      let raf = 0;
+      el.addEventListener('pointermove', e => { raf = raf || requestAnimationFrame(() => { raf = 0; const r = el.getBoundingClientRect(), x = (e.clientX - r.left) / r.width, y = (e.clientY - r.top) / r.height;
+        el.classList.add('tilting'); el.style.setProperty('--rx', ((0.5 - y) * 9).toFixed(2) + 'deg'); el.style.setProperty('--ry', ((x - 0.5) * 9).toFixed(2) + 'deg');
+        el.style.setProperty('--gx', (x * 100).toFixed(1) + '%'); el.style.setProperty('--gy', (y * 100).toFixed(1) + '%'); el.style.setProperty('--glare', 1); }); });
+      el.addEventListener('pointerleave', () => { cancelAnimationFrame(raf); raf = 0; el.classList.remove('tilting'); el.style.setProperty('--rx', '0deg'); el.style.setProperty('--ry', '0deg'); el.style.setProperty('--glare', 0); });
+    });
+    // tabs: #fly #cv #projects #contact, or any id inside the CV (a section) → the CV tab, scrolled there
+    let cur = null;
+    const route = () => {
+      const h = decodeURIComponent(location.hash.slice(1)), inCv = h && door.querySelector(`.pane-cv [id="${h.replace(/"/g, '')}"]`);
+      const tab = TABS.includes(h) ? h : inCv ? 'cv' : (cur || 'fly');
+      door.querySelectorAll('.pane[data-pane]').forEach(p => { p.hidden = p.dataset.pane !== tab; });
+      door.querySelectorAll('.hd-tabs a').forEach(a => a.setAttribute('aria-current', a.dataset.tab === tab ? 'page' : 'false'));
+      place(door.querySelector(`.hd-tabs a[data-tab="${tab}"]`), cur === null);
+      if (tab !== cur || TABS.includes(h)) scrollTo(0, 0);
+      if (inCv) inCv.scrollIntoView();
+      cur = tab; reveal(); top();
+    };
+    addEventListener('hashchange', route);
+    addEventListener('resize', () => place(door.querySelector('.hd-tabs a[aria-current=page]'), true));
+    route();
+    if (document.fonts) document.fonts.ready.then(() => place(door.querySelector('.hd-tabs a[aria-current=page]'), true));
+  }
+  function wireCv() {
+    door.querySelectorAll('[data-copy]').forEach(b => b.addEventListener('click', () => copy(C.email)));
+    door.querySelectorAll('[data-pdf]').forEach(b => b.addEventListener('click', () => print()));
     // filter: hide items that don't match, then empty sections; sub-headings follow their items
     const inp = $('#rs-filter'), none = $('#rs-none');
     const run = () => { const q = inp.value.trim().toLowerCase(); let any = false;

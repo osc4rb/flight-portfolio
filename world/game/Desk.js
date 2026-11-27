@@ -6,7 +6,7 @@ import * as THREE from 'three/webgpu'
 import { CSS3DRenderer, CSS3DObject } from 'three/addons/renderers/CSS3DRenderer.js'
 import { Game } from '../engine/Game.js'
 
-const SPOT = { x: - 78, z: - 99, yaw: 0, scale: 1.7 }      // faces +z, toward the default camera corner
+const SPOT = { x: - 94, z: - 104, yaw: 0, scale: 1.7 }      // in the start disc beside the jet, facing +z (toward the camera corner)
 const SCREEN = { w: 1.6, h: 0.9 }                          // metres, before the desk scale
 const ease = t => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(- 2 * t + 2, 3) / 2
 

@@ -14,7 +14,7 @@ import { Game } from '../engine/Game.js'
 import { MeshDefaultMaterial } from '../engine/Materials/MeshDefaultMaterial.js'
 import MeshGridMaterial, { MeshGridMaterialLine } from '../engine/Materials/MeshGridMaterial.js'
 
-const RADIUS = 3.5          // the disc you start in (his size)
+const RADIUS = 7            // the disc you start in (his 3.5 m, for a 2.6 m car; ours holds the robot, the desk and the jet's cockpit)
 const SWEEP = 45            // how far the ring travels before the rest pops in (his 30; our island is taller)
 
 export class Reveal
@@ -71,7 +71,7 @@ export class Reveal
         const f = g.view.focusPoint
         f.trackedPosition.set(this.position.x, 0, this.position.z); f.smoothedPosition.copy(f.trackedPosition)
 
-        if(this.skip) { this.distance.value = 99999; this.finish(); return }
+        if(this.skip) { this.distance.value = 99999; g.view.zoom.baseRatio = g.view.zoom.smoothedRatio = 0; this.finish(); return }
 
         g.domElement.classList.add('intro')
         g.inputs.filters.clear(); g.inputs.filters.add('intro')
@@ -94,9 +94,9 @@ export class Reveal
             {
                 this.distance.value = 0
                 gsap.to(this.distance, { value: RADIUS, ease: 'back.out(1.7)', duration: 2, overwrite: true })
-                // close in on the disc, then settle a little farther out (his 0.6 → 0.3; our play zoom is 0.6)
-                zoom.smoothedRatio = zoom.baseRatio = 1
-                gsap.to(zoom, { baseRatio: 0.85, ease: 'power1.inOut', duration: 1.25, overwrite: true })
+                // close in on the disc, then settle a little farther out (his values: 0.6 → 0.3)
+                zoom.smoothedRatio = zoom.baseRatio = 0.6
+                gsap.to(zoom, { baseRatio: 0.3, ease: 'power1.inOut', duration: 1.25, overwrite: true })
                 g.sound.pop(true)
                 gsap.delayedCall(1, () => this.showLabel())
                 this.listen()
@@ -110,7 +110,7 @@ export class Reveal
             // next task: the key that started it (Enter is also 'get in') must not also act in the world
             setTimeout(() => { g.inputs.filters.clear(); g.inputs.filters.add('wandering') }, 150)
             g.domElement.classList.remove('intro')
-            gsap.to(zoom, { baseRatio: 0.6, ease: 'back.in(1.5)', duration: 1.75, overwrite: true })
+            gsap.to(zoom, { baseRatio: 0, ease: 'back.in(1.5)', duration: 1.75, overwrite: true })      // his play zoom: all the way out
         }
         else if(step === 2)
         {
@@ -213,10 +213,11 @@ export class Reveal
         const label = this.label = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, transparent: true, depthWrite: false, depthTest: false }))
         label.renderOrder = 20
         label.userData.noReveal = true
-        // above the disc, just behind you as the camera sees it (his sits to the side; centred fits phones too)
-        const away = this.game.stage.cameraDirection().setY(0).normalize().multiplyScalar(- 1)
-        label.position.set(this.position.x + away.x, this.ground + 3.0, this.position.z + away.z)
-        this.labelSize = 3.2
+        // over the front of the disc, below you as the camera sees it, clear of the jet and the desk (his sits to the
+        // side; centred fits phones too)
+        const near = this.game.stage.cameraDirection().setY(0).normalize()               // points toward the camera
+        label.position.set(this.position.x + near.x * RADIUS, this.ground + 0.2, this.position.z + near.z * RADIUS)
+        this.labelSize = 5.2
         label.scale.setScalar(1e-4)
         this.game.scene.add(label)
     }

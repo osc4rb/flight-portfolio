@@ -135,6 +135,20 @@ window.FLIGHT_SITE = {
     pdf: "Save as PDF",
     filter: "Filter",
     empty: "Nothing on the page matches that.",
+    // the tabs at the top (2026-11-25, after silvjurado.com, kept black): Fly in is the front page
+    tabs: { fly: "Fly in", cv: "CV", projects: "Projects", contact: "Contact" },
+    // each project: tag, title, text, optional chips and href
+    projects: [
+      { tag: "Solo paper · AICAP 2027", title: "ADS-B position verification", text: "A receiver-side spoof detector that fuses learned signal-strength maps with sparse TDOA, so it still works when only one receiver hears the aircraft. Signal strength alone catches 90% of far spoofs at a 1% false-alarm rate on the public LocaRDS data.", chips: [ "Python", "scikit-learn", "TDOA" ] },
+      { tag: "Flagship · in progress", title: "Satellite navigation without GPS", text: "A cheap receiver that finds its position from Iridium satellite Doppler on an SDR, for small drones when GPS is jammed. Aimed at the ION GNSS+ 2027 student paper competition.", chips: [ "SDR", "Doppler", "IMU fusion" ] },
+      { tag: "NASA ULI · Task 1B", title: "Drone flight-data logger", text: "A Raspberry Pi Zero wired into the aircraft, a MAVLink radio link to the ground, and checks on every recorded log for NASA's electric-aircraft energy models.", chips: [ "Raspberry Pi", "MAVLink", "Python" ] },
+      { tag: "NASA SUITS · team", title: "Spacesuit AR display", text: "Proposal submitted for NASA's challenge to build an augmented-reality display for spacesuits; testing at NASA Johnson in spring 2027." },
+      { tag: "Shipped", title: "Falcon Bullets", text: "An accomplishment log for cadets that sorts bullets into the rated areas of the performance form, so evaluations take minutes instead of a weekend.", chips: [ "JavaScript", "Supabase" ], href: "https://osc4rb.github.io/falcon-bullets/" },
+      { tag: "Shipped", title: "Honors coaching matcher", text: "Pairs upper-class coaches with underclass cadets from a form, then opens the group chats on match day by itself.", chips: [ "TypeScript", "Power Automate" ], href: "https://github.com/osc4rb/martinson-coaching-match" },
+      { tag: "In use", title: "CS-37 squadron site", text: "One site for my squadron: the staff-summary builder, the strat scorer and Falcon Bullets." },
+      { tag: "Built", title: "ARIA", text: "A desktop assistant on the Claude API with a 3D interface. Camera hand-gesture control and on-screen hand effects work; voice is in progress.", chips: [ "Electron", "WebGL" ] },
+      { tag: "This site", title: "The island", text: "This résumé as a 3D island you can walk, drive and fly around, built on Bruno Simon's open-source engine.", chips: [ "three.js", "Rapier", "Blender" ], href: "world/index.html" },
+    ],
     sections: [
       { id: "research", title: "Research", say: ["Right now: flight data for NASA's electric-aircraft project, from a Pi Zero wired into the drone.", "His solo ADS-B paper went to AICAP 2027. It flags spoofed aircraft from signal strength alone.", "Next: finding position from Iridium satellite Doppler, for drones when GPS is jammed."],
         items: [
@@ -191,18 +205,24 @@ window.FLIGHT_SITE = {
   // its `goal` achievement unlocks (the ids are in world/game/Achievements.js).
   world: {
     // the opening disc (world/game/Reveal.js): the label beside it
-    intro: { start: "Click to start", note: "or press Enter · M turns the sound off", tap: "Tap to start", tapNote: "" },
+    intro: { start: "Click to start", note: "", tap: "Tap to start", tapNote: "" },
+    // the buttons at the top right (world/game/Hud.js): back to the home page, and the map
+    nav: { back: "← Back", backTitle: "Back to the home page", map: "Map", mapTitle: "Map of the island (M)" },
+    // the map (world/game/Map.js): click a place to go there
+    map: { title: "The island", hint: "Click a place to go there.", flying: "Land first, then pick a place to go.", close: "Close", you: "You" },
+    // labels over the places and pins on the map (world/game/Places.js); the five people use their titles from `home`
+    places: { computer: "CV", jet: "Jet", truck: "Truck", circuit: "Race", blimp: "Links" },
     from: "Oscar",
     quests: [
-      { goal: "takeoff",  text: "Hey, welcome to my island! The jet is right behind you: walk up to it, press E, then hold W to take off." },
-      { goal: "lap",      text: "Nice. See the yellow ring over the runway? Fly through it to start a lap, then follow the gates round the mountains." },
-      { goal: "land",     text: "Good flying! Now bring it down on the runway: throttle back with B and keep the wings level." },
-      { goal: "computer", text: "There's a desk next to the runway. Walk up to it and press E: my résumé is on the screen." },
-      { goal: "people",   text: "Five people in town each hold one part of what I do. Go and say hi to all of them." },
-      { goal: "blimp",    text: "The blimp circling the island carries my links. Fly close and they pop up." },
-      { goal: "secret",   text: "Last one, if you like a challenge: a gold ring is hidden high above the island." },
+      { goal: "takeoff",  at: "jet",      text: "Hey, welcome to my island! The jet is right behind you: walk up to it, press E, then hold W to take off." },
+      { goal: "lap",      at: "circuit",  text: "Nice. See the yellow ring over the runway? Fly through it to start a lap, then follow the gates round the mountains." },
+      { goal: "land",                    text: "Good flying! Now bring it down on the runway: throttle back with B and keep the wings level." },
+      { goal: "computer", at: "computer", text: "The computer where you started has my résumé on its screen. Walk up to it and press E." },
+      { goal: "people",   at: "people",   text: "Five people in town each hold one part of what I do. Go and say hi to all of them." },
+      { goal: "blimp",    at: "blimp",    text: "The blimp circling the island carries my links. Fly close and they pop up." },
+      { goal: "secret",                  text: "Last one, if you like a challenge: a gold ring is hidden high above the island." },
     ],
-    done: "That's everything. Thanks for flying by! The CV is always one click away, top right.",
+    done: "That's everything. Thanks for flying by!",
   },
 
   contact: {

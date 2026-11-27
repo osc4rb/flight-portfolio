@@ -25,6 +25,7 @@ Changed (each marked `[world patch]` in the code):
   systems we did not port: audio, achievements, tracks, weather, water and the rest.
 - `Player.js`: drives only when `game.mode === 'drive'`, and only then moves the camera and touch joystick.
 - `View.js`: the focus point follows height too, and `game.cameraOverride` lets the jet's chase camera take over.
+  The radius cap is 42 m, not his 30, because our jet and runway are about four times his car.
 - `Ticker.js`: delta is never negative, and a zero-length frame is skipped. Either one panics Rapier.
 - `Materials/MeshDefaultMaterial.js`: his shading model, copied. Patches: the water band is off by default,
   `flipBackNormals` lets grass keep an up normal on both sides, and emissive is added for the hover glow. The reveal
@@ -37,7 +38,7 @@ kept read-only in `../vendor/folio-2025/` for reference.
 
 ## Ours (`game/`)
 - `Reveal.js`: the opening, ported from his `Reveal.js`, `World/Intro.js` and `World/Grid.js`. A blue ring closes as
-  the loader fades and shrinks away. A 3.5 m disc of the island then opens on a dark blue grid, with a "Click to start"
+  the loader fades and shrinks away. A 7 m disc (his is 3.5 m) holding the robot, the desk and the jet's cockpit then opens on a dark blue grid, with a "Click to start"
   label (words in `site.js` → `world.intro`). A click, a tap, Enter, Space, W or ↑ sweeps the glowing edge out to 45 m
   (back.in, 2 s); then everything shows. His timing and eases are kept. The sound is synthesized (`Sound.reveal()`).
   - Every MeshDefaultMaterial cuts at the reveal distance with his glowing band. Other materials get `maskNode`, and
@@ -46,6 +47,14 @@ kept read-only in `../vendor/folio-2025/` for reference.
   - The input filter is `intro` until the sweep starts, and `wandering` 150 ms later, so Enter does not also board
     the jet.
   - `?skip=1` or `#skip` opens the world at once.
+  - The camera follows his zoom: 0.6 → 0.3 while the disc waits, then out to 0 (the 42 m cap) for play.
+- `Places.js`: wayfinding. A floating label (the stations' sprite style) over the computer, the jet, the truck, the
+  race start and the blimp, hidden during the opening. An arrow at the screen's edge points to what the current quest
+  needs (`site.js` → `world.quests[i].at`; "people" means the nearest one not met yet).
+- `Map.js` (class `IslandMap`): M or the Map button. The island is drawn once on a canvas from our own `height()`,
+  roads, runway, houses and the lap's gates, turned 45° so up on the map is up on screen. Each pin is a place, and a
+  click travels there (a wipe, then you stand beside it); in flight the pins are off. After his `Map.js` (a painted
+  map there). Sound moved from M to N.
 - `Stage.js`: the island built in code:
   - terrain mesh plus a Rapier heightfield on the same grid
   - sea, roads, runway and trees

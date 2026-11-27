@@ -8,7 +8,7 @@ import { Game } from '../engine/Game.js'
 import { rng } from './Stage.js'
 
 const BEST = 'world-course-best', TOP = 'world-course-top'
-const PODIUM = { x: 80, z: - 99.5 }                       // clear of the start gantry's posts
+export const PODIUM = { x: 80, z: - 99.5 }                       // clear of the start gantry's posts
 const ROCK = { base: '#c39a6b', dark: '#93735a', moss: '#74b84a', snow: '#fbf8f0' }
 const SHAPE = 0.85                                         // peak profile: radius = r * (1 - u)^SHAPE, rounder below 1
 

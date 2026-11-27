@@ -11,20 +11,21 @@ export class Hud
     constructor()
     {
         this.game = Game.getInstance()
-        const S = this.game.site, coarse = matchMedia('(pointer: coarse)').matches
+        const S = this.game.site, nav = (S.world && S.world.nav) || {}, coarse = matchMedia('(pointer: coarse)').matches
         this.el = document.getElementById('hud')
         this.el.innerHTML = `
           <div class="h-top">
             <span class="h-chip h-coins" id="h-coins" hidden>● 0</span>
             <button type="button" class="h-btn h-right" id="h-ach" aria-expanded="false" title="Achievements">★ 0</button>
-            <button type="button" class="h-btn" id="h-sound" aria-pressed="true" title="Sound (M)">Sound on</button>
-            <button type="button" class="h-btn" id="h-help" aria-expanded="false">Controls</button>
-            <a class="h-btn h-cv" href="../index.html">Just the CV</a>
+            <button type="button" class="h-btn h-ico" id="h-sound" aria-pressed="true" title="Sound (N)" aria-label="Sound"><svg viewBox='0 0 24 24' width='18' height='18' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' aria-hidden='true'><path d='M4 9v6h4l5 4V5L8 9z'/><path class='w' d='M16.5 8.5a5 5 0 0 1 0 7'/><path class='x' d='M16 9l5 6M21 9l-5 6'/></svg></button>
+            <button type="button" class="h-btn h-ico" id="h-help" aria-expanded="false" title="Controls" aria-label="Controls">?</button>
+            <button type="button" class="h-btn h-mapbtn" id="h-map" title="${esc(nav.mapTitle)}"><kbd>M</kbd>${esc(nav.map)}</button>
+            <a class="h-btn h-cv" href="../index.html" title="${esc(nav.backTitle)}">${esc(nav.back)}</a>
           </div>
           <div class="h-help" id="h-helpbox" hidden>
             ${coarse ? `<p><b>Drag</b> the ring under you to move or drive. <b>Tap E</b> to get in, out, or talk.</p>`
                      : `<p><b>WASD</b> move · <b>Shift</b> run or boost · <b>Space</b> jump</p>
-                        <p><b>E</b> get in or out, talk to people · <b>R</b> respawn · <b>H</b> honk · <b>M</b> sound · <b>wheel</b> zoom · <b>drag</b> look around</p>
+                        <p><b>E</b> get in or out, talk to people · <b>R</b> respawn · <b>H</b> honk · <b>M</b> map · <b>N</b> sound · <b>wheel</b> zoom · <b>drag</b> look around</p>
                         <p><b>Click</b> a person, the truck or the jet to walk over to it</p>
                         <p>In the jet: <b>W</b> roll and pull up · <b>S</b> push down · <b>A/D</b> bank · <b>Shift</b> afterburner · <b>B</b> brake</p>`}
             <p class="h-mute">Find the five people around the island: they hold the résumé. Coins are for fun.</p>
@@ -43,6 +44,7 @@ export class Hud
         this.$ = id => document.getElementById(id)
         this.$('h-help').addEventListener('click', () => this.help(this.$('h-helpbox').hidden))
         this.$('h-ach').addEventListener('click', () => { const b = this.$('h-achbox'); b.hidden = !b.hidden; this.$('h-ach').setAttribute('aria-expanded', !b.hidden); if(!b.hidden) this.help(false) })
+        this.$('h-map').addEventListener('click', () => this.game.map && (this.game.map.open ? this.game.map.close() : this.game.map.show()))
         this.$('h-sound').addEventListener('click', () => { this.game.sound.start(); this.game.sound.toggle() })
         this.sound(this.game.sound ? this.game.sound.muted : false)
         this.$('h-prompt').addEventListener('click', () => this.game.modes.interact())
@@ -51,11 +53,8 @@ export class Hud
         addEventListener('keydown', e => { if(e.key === 'Escape' && !this.$('h-panel').hidden) this.closePanel() })
     }
 
-    ready()
-    {
-        this.help(true)
-        clearTimeout(this.helpT); this.helpT = setTimeout(() => this.help(false), 9000)
-    }
+    // nothing pops open at the start: the controls wait behind the ? button
+    ready() {}
 
     help(on)
     {
@@ -77,7 +76,7 @@ export class Hud
     sound(muted)
     {
         const b = this.$('h-sound'); if(!b) return
-        b.textContent = muted ? 'Sound off' : 'Sound on'; b.setAttribute('aria-pressed', !muted); b.classList.toggle('off', muted)
+        b.setAttribute('aria-pressed', !muted); b.classList.toggle('off', muted)
     }
 
     // a speech bubble over a person, typed out a letter at a time with their voice

@@ -22,6 +22,7 @@ export class Quests
         this.el.innerHTML = `<button type="button" class="h-msghead" aria-expanded="true">${face ? `<img src="${esc(face)}" alt="" width="22" height="22">` : ''}<b>${esc(this.from)}</b><i class="h-unread" hidden></i></button><ol class="h-thread" aria-live="polite"></ol>`
         document.getElementById('hud').appendChild(this.el)
         this.thread = this.el.querySelector('.h-thread')
+        this.toggle(false)                                  // folded at the start: a dot says a message is waiting
         this.el.querySelector('.h-msghead').addEventListener('click', () => this.toggle())
         this.step = this.list.findIndex(q => !this.isDone(q.goal))
         // the first message once the world is up; nothing if every step is already done on this device

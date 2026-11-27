@@ -182,11 +182,12 @@ export class Jet
         }
         else
         {
-            const wantBank = inp.roll * 1.05
-            s.bank += (wantBank - s.bank) * Math.min(1, dt * 2.5)
-            s.pitch = Math.max(- 1.1, Math.min(1.1, s.pitch + inp.pitch * 0.9 * dt))
+            // bank up to 77° and get there quickly; the turn follows the bank, capped so it stays flyable
+            const wantBank = inp.roll * 1.35
+            s.bank += (wantBank - s.bank) * Math.min(1, dt * 6)
+            s.pitch = Math.max(- 1.1, Math.min(1.1, s.pitch + inp.pitch * 1.2 * dt))
             if(Math.abs(inp.pitch) < 0.05) s.pitch -= s.pitch * 0.4 * dt                      // gentle self-levelling
-            s.yaw -= 9.81 * Math.tan(s.bank) / Math.max(s.v, 18) * dt * 1.2
+            s.yaw -= Math.max(- 1.1, Math.min(1.1, 9.81 * Math.tan(s.bank) / Math.max(s.v, 18) * 2.2)) * dt
             if(s.v < 17) s.pitch -= (17 - s.v) * 0.05 * dt                                     // stall: nose drops
             s.v = Math.min(90, Math.max(10, s.v + (thrust - 0.0035 * s.v * s.v - 9.81 * Math.sin(s.pitch)) * dt))
             const cp = Math.cos(s.pitch)
@@ -252,7 +253,7 @@ export class Jet
         const back = 17 + Math.min(1, s.v / 80) * 4 + fx.boost * 2
         const want = this.position.clone().addScaledVector(this.forward, - back).addScaledVector(UP, 4.6)
         const look = this.position.clone().addScaledVector(this.forward, 30)
-        const k = this.chase.init ? Math.min(1, dt * 5) : 1
+        const k = this.chase.init ? Math.min(1, dt * 8) : 1
         this.chase.pos.lerp(want, k); this.chase.look.lerp(look, k); this.chase.init = true
         cam.position.copy(this.chase.pos)
         cam.up.copy(UP).lerp(this.up, 0.35).normalize()

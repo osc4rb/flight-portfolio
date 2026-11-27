@@ -34,8 +34,8 @@ export class Modes
         j.addTarget(this.game.desk.group, 'computer', () => this.game.desk.use())
         j.addTarget(this.game.sky.blimp, 'blimp', () => this.game.sky.showLinks())
         this.game.mode = 'foot'
-        // flight comes first: you start beside the jet, with the computer a few steps away
-        this.game.walker.moveTo(this.game.jet.door.add(new THREE.Vector3(3, 1.2, 3)), Math.PI * 0.75)
+        // you start in the opening disc between the jet and the computer (Desk.js SPOT), facing the camera
+        this.game.walker.moveTo(this.game.jet.door.add(new THREE.Vector3(2.5, 1.2, 3.6)), Math.PI * 0.75)
         this.game.walker.setActive(true)
         this.game.reveal.then(() => this.game.hud.ready())
         this.refreshPrompt()
@@ -78,7 +78,7 @@ export class Modes
         const a = this.action(); if(a) a.run()
     }
 
-    close() { if(this.desk) this.desk.leave(); else this.game.hud.closePanel() }
+    close() { if(this.game.map && this.game.map.open) this.game.map.close(); else if(this.desk) this.desk.leave(); else this.game.hud.closePanel() }
 
     enter(mode)
     {
