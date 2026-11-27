@@ -477,3 +477,5 @@ html.plain-mode body{background:#100f0f}
 @media print{.hx{display:none}}
 @media (max-width:700px){.pane-in{padding-left:16px;padding-right:16px}}
 @media (max-width:560px){.pns{grid-template-columns:1fr}}
+.hx-fly{overflow:hidden}
+.hx-fly::before{inset:0}

@@ -99,7 +99,7 @@
       <main id="content">
         <section class="pane pane-fly" data-pane="fly" aria-label="${esc(TB.fly || 'Fly in')}">
           <div class="hx"><a class="hx-img" href="world/index.html" tabindex="-1" aria-hidden="true"><img src="assets/world-hero.webp" alt="" width="2200" height="1100" fetchpriority="high" decoding="async"></a>
-            <div class="hx-text"><h1 class="hero-h fu">${esc(NAME)}</h1>${V.lede ? `<p class="hero-l fu">${md(V.lede)}</p>` : ''}<a class="hx-fly fu" href="world/index.html">${esc(TB.fly || 'Fly in')}<span class="arw" aria-hidden="true">→</span></a></div></div>
+            <div class="hx-text"><h1 class="hero-h fu">${esc(NAME)}</h1>${V.lede ? `<p class="hero-l fu">${md(V.lede)}</p>` : ''}<a class="hx-fly fu" href="world/index.html" data-tilt>${esc(TB.fly || 'Fly in')}<span class="arw" aria-hidden="true">→</span></a></div></div>
           <div class="pane-in"><div class="pns">${panes}</div></div></section>
         <section class="pane pane-cv" data-pane="cv" aria-label="${esc(TB.cv || 'CV')}" hidden>${cv}</section>
         <section class="pane" data-pane="projects" aria-label="${esc(TB.projects || 'Projects')}" hidden><h2 class="pg-h fu">${esc(TB.projects || 'Projects')}</h2><div class="pcs">${proj}</div></section>

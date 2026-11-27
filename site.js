@@ -205,7 +205,7 @@ window.FLIGHT_SITE = {
   // its `goal` achievement unlocks (the ids are in world/game/Achievements.js).
   world: {
     // the opening disc (world/game/Reveal.js): the label beside it
-    intro: { start: "Click to start", note: "", tap: "Tap to start", tapNote: "" },
+    intro: { start: "Click to start", tap: "Tap to start", sound: "Sound" },
     // the buttons at the top right (world/game/Hud.js): back to the home page, and the map
     nav: { back: "← Back", backTitle: "Back to the home page", map: "Map", mapTitle: "Map of the island (M)" },
     // the map (world/game/Map.js): click a place to go there

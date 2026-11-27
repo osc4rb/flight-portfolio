@@ -1,10 +1,10 @@
 /* Perf.js — keeps the frame rate up on slower GPUs. Once the island is revealed it times real frames for two seconds;
-   if the median frame is slower than about 50 fps it renders fewer pixels (pixel ratio 1.5 → 1 → 0.75) and checks
+   if the median frame is slower than about 50 fps it renders fewer pixels (pixel ratio 1.5 → 1) and checks
    again. A hidden tab gets no frames, so nothing is judged there. */
 import { Game } from '../engine/Game.js'
 
 const SLOW = 20                     // ms: a median frame longer than this steps down
-const STEPS = [ 1, 0.75 ]
+const STEPS = [ 1 ]                 // never below 1: lower blurs the world and its labels
 
 export class Perf
 {

@@ -61,7 +61,8 @@ export class Game
 
     async init()
     {
-        const progress = this.options.onProgress || noop
+        const report = this.options.onProgress || noop
+        const progress = (k, what) => { this.reveal && this.reveal.progress && this.reveal.progress(k); report(k, what) }
         this.site = window.FLIGHT_SITE || {}
         this.domElement = document.querySelector('.game')
         this.canvasElement = this.domElement.querySelector('.js-canvas')
@@ -102,6 +103,8 @@ export class Game
         if(!this.debug.active) this.scene.remove(this.view.cameraHelper)   // his debug-only helper: NaN while the viewport has no size
         this.rendering.setPostprocessing()
         this.rendering.start()
+        this.reveal = new Reveal()                 // the opening: the ring and grid show now, the world loads behind them
+        this.reveal.boot && this.reveal.boot()     // guarded: a cached older Reveal.js has no boot
         this.objects = new Objects()
         this.physics = new Physics()
 
@@ -123,7 +126,6 @@ export class Game
         this.desk = new Desk()                     // the computer by the airstrip: the résumé on its screen
         this.letters = new Letters()               // the name in big blocks you can knock over
         this.sky = new Sky()                       // the blimp with the links, and the secret ring
-        this.reveal = new Reveal()                 // the opening disc: every MeshDefaultMaterial reads its uniforms
         this.look = new Look()                     // folio-2025's lighting, fog and materials, our colours
         this.look.convert()
         this.stage.water.material = this.look.waterMaterial()
@@ -143,7 +145,8 @@ export class Game
         // compile every shader now, behind the loader, so nothing hitches the first time it comes into view
         progress(0.95, 'shaders')
         const t = performance.now()
-        try { await this.rendering.renderer.compileAsync(this.scene, this.view.camera) } catch(e) { console.warn('compile', e) }
+        const every = this.view.camera.clone(); every.layers.enableAll()           // the camera only sees the ring while loading
+        try { await this.rendering.renderer.compileAsync(this.scene, every) } catch(e) { console.warn('compile', e) }
         this.compileMs = Math.round(performance.now() - t)
         progress(1, 'ready')
         this.reveal.start(this.walker.position.clone().add({ x: - 2, y: 0, z: - 1.8 }))  // the disc: you, the desk and the jet's cockpit

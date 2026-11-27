@@ -11,10 +11,12 @@ import * as THREE from 'three/webgpu'
 import { uniform, vec2, vec4, color, Fn, atan, PI2, positionGeometry, positionWorld } from 'three/tsl'
 import gsap from 'gsap'
 import { Game } from '../engine/Game.js'
-import { MeshDefaultMaterial } from '../engine/Materials/MeshDefaultMaterial.js'
 import MeshGridMaterial, { MeshGridMaterialLine } from '../engine/Materials/MeshGridMaterial.js'
 
 const RADIUS = 7            // the disc you start in (his 3.5 m, for a 2.6 m car; ours holds the robot, the desk and the jet's cockpit)
+// the disc's centre: the jet's parking spot (Jet.park), the walker's offset from its door (Modes.start) and the
+// disc offset from the walker (Game.js). The ring shows here before anything else has loaded.
+const START = { x: - 91.5, z: - 107 }
 const SWEEP = 45            // how far the ring travels before the rest pops in (his 30; our island is taller)
 
 export class Reveal
@@ -61,6 +63,29 @@ export class Reveal
         })
     }
 
+    // ---------------------------------------------------------------- straight away, before the world loads
+    // his Intro loader: only the dark grid and the ring are drawn (camera layer 1) while everything else loads behind
+    // them, and the ring fills with the loading progress
+    boot()
+    {
+        if(this.skip) return
+        const g = this.game
+        this.position.set(START.x, 0, START.z); this.position2Uniform.value.set(START.x, START.z)
+        this.ground = g.stage.height(START.x, START.z); this.position.y = this.ground
+        const f = g.view.focusPoint
+        f.trackedPosition.set(START.x, this.ground, START.z); f.position.copy(f.trackedPosition); f.smoothedPosition.copy(f.trackedPosition)
+        g.view.zoom.smoothedRatio = g.view.zoom.baseRatio = 0.6
+        for(const cam of [ g.view.camera, g.view.defaultCamera ]) cam.layers.set(1)
+        this.setCircle(); this.setGrid()
+        this.circle.mesh.layers.set(1); this.grid.layers.set(1)
+        g.scene.add(this.grid)
+        g.domElement.classList.add('intro')
+        this.booted = true
+    }
+
+    // the share of the world that has loaded, 0..1
+    progress(k) { if(this.circle) this.circle.progress = Math.max(this.circle.progress, k) }
+
     // ---------------------------------------------------------------- the opening, step by step (his updateStep)
     start(center)
     {
@@ -75,13 +100,12 @@ export class Reveal
 
         g.domElement.classList.add('intro')
         g.inputs.filters.clear(); g.inputs.filters.add('intro')
-        this.setCircle()
-        this.setGrid()
+        if(!this.booted) { this.setCircle(); this.setGrid(); g.scene.add(this.grid) }
         this.setLabel()
-        g.scene.add(this.grid)
-        // the ring closes as the loader fades out, then hands over to the disc
+        for(const cam of [ g.view.camera, g.view.defaultCamera ]) cam.layers.enable(0)
+        // the ring completes, then hands over to the disc
         this.circle.progress = 1
-        gsap.delayedCall(1.1, () => this.updateStep(0))
+        gsap.delayedCall(0.5, () => this.updateStep(0))
     }
 
     updateStep(step)
@@ -115,7 +139,7 @@ export class Reveal
         else if(step === 2)
         {
             this.grid.removeFromParent(); this.grid.geometry.dispose(); this.grid.material.dispose()
-            this.label.removeFromParent(); this.label.material.map.dispose(); this.label.material.dispose()
+            this.labelEl && this.labelEl.remove()
             this.circle.mesh.geometry.dispose(); this.circle.mesh.material.dispose()
             this.finish()
         }
@@ -183,12 +207,11 @@ export class Reveal
     {
         const lines = [ new MeshGridMaterialLine('#3d6bff', 10, 0.02, 0.2), new MeshGridMaterialLine('#2f3b66', 100, 0.002, 1) ]
         const grid = new MeshGridMaterial({ color: 0x10131f, scale: 0.001, antialiased: true, reference: 'uv', side: THREE.DoubleSide, lines })
-        const shaded = new MeshDefaultMaterial({ colorNode: grid.outputNode.rgb, hasWater: false, hasReveal: false, hasLightBounce: false, hasEmissive: false })
-        shaded.isMeshDefault = true
+        const base = grid.outputNode                                  // unlit: it is drawn before the world's lights exist
         grid.outputNode = Fn(() =>
         {
             positionWorld.xz.sub(this.position2Uniform).length().lessThan(this.distance).discard()
-            return shaded.outputNode
+            return base
         })()
         this.grid = new THREE.Mesh(new THREE.PlaneGeometry(100, 100), grid)
         this.grid.rotation.x = - Math.PI * 0.5
@@ -197,41 +220,36 @@ export class Reveal
         this.grid.userData.noReveal = true
     }
 
-    // ---------------------------------------------------------------- the label beside the disc (our words)
+    // ---------------------------------------------------------------- the label beside the disc (his layout, our words)
+    // page text, not a texture, so it stays sharp; it sits just right of the disc with an arrow toward it and the sound
+    // button under it
     setLabel()
     {
-        const W = (this.game.site.world || {}).intro || {}
+        const g = this.game, W = (g.site.world || {}).intro || {}
         const touch = matchMedia('(pointer: coarse)').matches
-        const big = touch ? W.tap || W.start || '' : W.start || '', small = touch ? W.tapNote || '' : W.note || ''
-        const c = document.createElement('canvas'); c.width = 1024; c.height = 512
-        const x = c.getContext('2d'), font = getComputedStyle(document.body).fontFamily || 'system-ui, sans-serif'
-        x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillStyle = '#ffffff'
-        x.shadowColor = 'rgba(10, 16, 48, 0.55)'; x.shadowBlur = 18
-        x.font = `700 132px ${font}`; x.fillText(big, 512, small ? 210 : 256, 980)
-        if(small) { x.font = `500 58px ${font}`; x.globalAlpha = 0.85; x.fillText(small, 512, 352, 980) }
-        const tex = new THREE.CanvasTexture(c); tex.colorSpace = THREE.SRGBColorSpace; tex.anisotropy = 4
-        const label = this.label = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, transparent: true, depthWrite: false, depthTest: false }))
-        label.renderOrder = 20
-        label.userData.noReveal = true
-        // over the front of the disc, below you as the camera sees it, clear of the jet and the desk (his sits to the
-        // side; centred fits phones too)
-        const near = this.game.stage.cameraDirection().setY(0).normalize()               // points toward the camera
-        label.position.set(this.position.x + near.x * RADIUS, this.ground + 0.2, this.position.z + near.z * RADIUS)
-        this.labelSize = 5.2
-        label.scale.setScalar(1e-4)
-        this.game.scene.add(label)
+        const esc = t => String(t || '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]))
+        const el = this.labelEl = document.createElement('div'); el.className = 'intro-label'
+        el.innerHTML = '<svg class="il-arrow" viewBox="0 0 64 34" aria-hidden="true"><path d="M60 8 C44 2 24 6 8 24 M8 24 L10 12 M8 24 L20 21"/></svg>'
+            + '<span class="il-text">' + esc(touch ? W.tap || W.start : W.start) + '</span>'
+            + '<button type="button" class="il-sound" aria-label="' + esc(W.sound || 'Sound') + '"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9z"/><path class="w" d="M16.5 8.5a5 5 0 0 1 0 7"/><path class="x" d="M16 9l5 6M21 9l-5 6"/></svg></button>'
+        document.body.appendChild(el)
+        const btn = el.querySelector('.il-sound')
+        btn.classList.toggle('off', !!(g.sound && g.sound.muted))
+        btn.addEventListener('pointerdown', e => e.stopPropagation())
+        btn.addEventListener('click', e => { e.stopPropagation(); g.sound.start(); g.sound.toggle(); btn.classList.toggle('off', g.sound.muted) })
+        // just past the disc's right edge as the camera sees it (screen right is world +x, -z)
+        this.anchor = new THREE.Vector3(this.position.x + (RADIUS + 0.6) / Math.SQRT2, this.ground, this.position.z - (RADIUS + 0.6) / Math.SQRT2)
     }
 
-    showLabel()
-    {
-        const d = { s: 0 }, L = this.label, w = this.labelSize
-        gsap.to(d, { s: 1, duration: 2, delay: 1, ease: 'elastic.out(1, 0.5)', overwrite: true, onUpdate: () => L.scale.set(Math.max(1e-4, w * d.s), Math.max(1e-4, w * 0.5 * d.s), 1) })
-    }
+    showLabel() { this.labelEl && this.labelEl.classList.add('on') }
+    hideLabel() { this.labelEl && this.labelEl.classList.remove('on') }
 
-    hideLabel()
+    placeLabel()
     {
-        const L = this.label, sx = L.scale.x, sy = L.scale.y, d = { s: 1 }
-        gsap.to(d, { s: 0, duration: 0.3, ease: 'power2.in', overwrite: true, onUpdate: () => L.scale.set(Math.max(1e-4, sx * d.s), Math.max(1e-4, sy * d.s), 1) })
+        const el = this.labelEl; if(!el) return
+        const v = this.anchor.clone().project(this.game.view.camera)
+        const x = Math.min((v.x + 1) / 2 * innerWidth, innerWidth - el.offsetWidth - 12), y = (1 - v.y) / 2 * innerHeight   // stays on screen
+        el.style.transform = 'translate(' + x.toFixed(1) + 'px, ' + y.toFixed(1) + 'px)'
     }
 
     update()
@@ -242,5 +260,6 @@ export class Reveal
         if(P && P.revealColor) { this.color.value.copy(P.revealColor.value); this.intensity.value = P.revealIntensity.value * this.intensityMultiplier }
         // the ring at the disc's edge breathes while it waits for a click
         if(this.step === 0) this.intensityMultiplier = 1 + Math.sin(performance.now() / 420) * 0.12
+        if(this.labelEl && this.step >= 0 && this.step < 2) this.placeLabel()
     }
 }
