@@ -78,7 +78,7 @@ export class Modes
         const a = this.action(); if(a) a.run()
     }
 
-    close() { if(this.game.map && this.game.map.open) this.game.map.close(); else if(this.desk) this.desk.leave(); else this.game.hud.closePanel() }
+    close() { if(this.game.course && this.game.course.result) this.game.course.closeResult(); else if(this.game.map && this.game.map.open) this.game.map.close(); else if(this.desk) this.desk.leave(); else this.game.hud.closePanel() }
 
     enter(mode)
     {

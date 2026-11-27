@@ -6,6 +6,7 @@
 import * as THREE from 'three/webgpu'
 import { Game } from '../engine/Game.js'
 import { rng } from './Stage.js'
+import { Leaderboard } from './Leaderboard.js'
 
 const BEST = 'world-course-best', TOP = 'world-course-top'
 export const PODIUM = { x: 80, z: - 99.5 }                       // clear of the start gantry's posts
@@ -319,7 +320,10 @@ export class Course
         if(!this.top.length && this.best) this.top = [ this.best ]
         this.boardCanvas = document.createElement('canvas'); this.boardCanvas.width = 1024; this.boardCanvas.height = 576
         this.boardTex = new THREE.CanvasTexture(this.boardCanvas); this.boardTex.colorSpace = THREE.SRGBColorSpace
+        this.leaderboard = new Leaderboard()                     // shared times when a project is set; this device's otherwise
+        this.rows = this.top.map(time => ({ name: '', time }))
         this.drawBoard()
+        this.refreshBoard()
         const bx = PODIUM.x + 12, bz = - 99, by = H(bx, bz)
         const board = new THREE.Mesh(new THREE.PlaneGeometry(8, 4.5), new THREE.MeshBasicMaterial({ map: this.boardTex })); board.position.set(bx, by + 5.6, bz + 0.13); board.userData.keepMaterial = true; this.group.add(board)
         const frame = new THREE.Mesh(new THREE.BoxGeometry(8.4, 4.9, 0.2), dark); frame.position.set(bx, by + 5.6, bz); frame.castShadow = true; this.group.add(frame)
@@ -340,29 +344,92 @@ export class Course
         }
     }
 
+    // the board on the podium: everyone's five fastest laps when the shared board is on, this device's three otherwise
     drawBoard()
     {
-        const x = this.boardCanvas.getContext('2d'), W = 1024, H = 576
+        const R = (this.game.site.world || {}).race || {}
+        const x = this.boardCanvas.getContext('2d'), W = 1024, H = 576, shared = this.leaderboard && this.leaderboard.on, n = shared ? 5 : 3
         x.fillStyle = '#100f0f'; x.fillRect(0, 0, W, H)
-        x.fillStyle = '#f2c94c'; x.fillRect(64, 70, 90, 10)
-        x.fillStyle = '#cecdc3'; x.font = '600 58px system-ui, sans-serif'; x.fillText('Fastest laps', 64, 150)
-        for(let k = 0; k < 3; k++)
+        x.fillStyle = '#f2c94c'; x.fillRect(64, 56, 90, 10)
+        x.fillStyle = '#cecdc3'; x.font = '600 54px system-ui, sans-serif'; x.fillText(R.board || '', 64, 128)
+        const step = shared ? 76 : 100, y0 = shared ? 218 : 250
+        for(let k = 0; k < n; k++)
         {
-            const y = 260 + k * 100, v = this.top[k]
-            x.fillStyle = '#878580'; x.font = '48px ui-monospace, Consolas, monospace'; x.fillText(String(k + 1), 64, y)
-            x.fillStyle = k === 0 ? '#f2c94c' : '#cecdc3'; x.font = '600 64px ui-monospace, Consolas, monospace'
-            x.fillText(v ? v.toFixed(1) + ' s' : '—', 150, y)
+            const y = y0 + k * step, r = this.rows[k]
+            x.fillStyle = '#878580'; x.font = '40px ui-monospace, Consolas, monospace'; x.fillText(String(k + 1), 64, y)
+            x.fillStyle = k === 0 ? '#f2c94c' : '#cecdc3'; x.font = '600 52px ui-monospace, Consolas, monospace'
+            x.fillText(r ? r.time.toFixed(1) + ' s' : '—', 130, y)
+            if(r && r.name) { x.fillStyle = '#cecdc3'; x.font = '500 44px system-ui, sans-serif'; x.fillText(r.name.slice(0, 16), 400, y, 560) }
         }
         this.boardTex.needsUpdate = true
+    }
+
+    async refreshBoard()
+    {
+        const rows = await this.leaderboard.top(10)
+        if(rows) { this.rows = rows; this.drawBoard(); if(this.result) this.fillResult() }
     }
 
     lapDone(t)
     {
         this.ceremonyArmed = true                                                          // land and stop for the podium
+        this.lastLap = t; this.posted = false
         this.top = [ ...this.top, t ].sort((a, b) => a - b).slice(0, 3)
         localStorage.setItem(TOP, JSON.stringify(this.top.map(v => +v.toFixed(2))))
+        if(!this.leaderboard.on) this.rows = this.top.map(time => ({ name: '', time }))
         this.drawBoard()
         const a = this.game.achievements; if(a) { a.unlock('lap'); if(t < 25) a.unlock('fast') }
+    }
+
+    // ---------------------------------------------------------------- the result on the podium: your lap, a name, the board
+    showResult()
+    {
+        if(!this.lastLap) return
+        const R = (this.game.site.world || {}).race || {}, esc = t => String(t == null ? '' : t).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]))
+        const el = this.result = document.createElement('div'); el.className = 'h-result'; el.setAttribute('role', 'dialog'); el.setAttribute('aria-label', R.board || '')
+        const shared = this.leaderboard.on
+        el.innerHTML = '<div class="r-card"><header><span class="r-k">' + esc(R.yourLap) + '</span><b class="r-t">' + this.lastLap.toFixed(1) + ' s</b>'
+            + '<button type="button" class="h-x" data-close aria-label="' + esc(R.close) + '">×</button></header>'
+            + (shared ? '<form class="r-form"><input maxlength="16" autocomplete="nickname" spellcheck="false" placeholder="' + esc(R.name) + '" aria-label="' + esc(R.name) + '"><button type="submit" class="r-post">' + esc(R.post) + '</button></form>' : '')
+            + '<ol class="r-list"></ol></div>'
+        document.getElementById('hud').appendChild(el)
+        const input = el.querySelector('input'), form = el.querySelector('form')
+        el.addEventListener('click', e => { if(e.target.closest('[data-close]')) this.closeResult() })
+        if(input)
+        {
+            input.value = this.leaderboard.name
+            // keys typed here are for the name only: none reach the world (M, N, E, Enter, Esc)
+            input.addEventListener('keydown', e => { e.stopPropagation(); if(e.key === 'Escape') this.closeResult() })
+            input.addEventListener('keyup', e => e.stopPropagation())
+            form.addEventListener('submit', async e =>
+            {
+                e.preventDefault()
+                if(this.posted || !input.value.trim()) return
+                const btn = form.querySelector('button'); btn.disabled = true
+                const ok = await this.leaderboard.post(input.value, this.lastLap)
+                if(ok) { this.posted = true; btn.textContent = R.posted || ''; input.disabled = true; this.refreshBoard() }
+                else btn.disabled = false
+            })
+            setTimeout(() => input.focus({ preventScroll: true }), 50)
+        }
+        this.fillResult()
+        if(shared) this.refreshBoard()
+    }
+
+    fillResult()
+    {
+        const list = this.result && this.result.querySelector('.r-list'); if(!list) return
+        const esc = t => String(t == null ? '' : t).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]))
+        const me = this.leaderboard.name, mine = r => this.posted && r.name === me && Math.abs(r.time - this.lastLap) < 0.01
+        list.innerHTML = this.rows.slice(0, 10).map((r, k) => '<li' + (mine(r) ? ' class="me"' : '') + '><span>' + (k + 1) + '</span><b>' + r.time.toFixed(1) + ' s</b><i>' + esc(r.name) + '</i></li>').join('')
+    }
+
+    closeResult()
+    {
+        if(!this.result) return
+        this.result.remove(); this.result = null
+        if(!this.game.modes.ceremony) this.game.modes.lock(false)
+        this.game.canvasElement.focus && this.game.canvasElement.focus()
     }
 
     // the podium ceremony, after his circuit's end: land and stop after a lap, and the pilot stands on the top step
@@ -379,7 +446,7 @@ export class Course
             g.modes.lock(true); g.modes.ceremony = true
             g.achievements && g.achievements.unlock('podium')
             g.sound.chime(); setTimeout(() => g.sound.chime(), 450)
-            g.hud.toast(this.top.length ? `Fastest lap ${this.top[0].toFixed(1)} s` : '', true)
+            this.showResult()
             let t = 0
             g.cameraOverride = cam =>
             {
@@ -393,7 +460,7 @@ export class Course
                 clearInterval(bursts)
                 g.hud.wipe(() =>
                 {
-                    g.cameraOverride = null; g.modes.ceremony = false; g.modes.lock(false)
+                    g.cameraOverride = null; g.modes.ceremony = false; if(!this.result) g.modes.lock(false)
                     g.walker.moveTo(new THREE.Vector3(x, H(x, z + 3.5) + 1.2, z + 3.5), - Math.PI / 2)
                 })
             }, 4800)
