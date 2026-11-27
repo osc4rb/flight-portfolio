@@ -22,6 +22,7 @@ import { Walker } from '../game/Walker.js'
 import { Jet } from '../game/Jet.js'
 import { Course } from '../game/Course.js'
 import { Desk } from '../game/Desk.js'
+import { Room } from '../game/Room.js'
 import { Achievements } from '../game/Achievements.js'
 import { Letters } from '../game/Letters.js'
 import { Sky } from '../game/Sky.js'
@@ -124,6 +125,7 @@ export class Game
         this.jet = new Jet()
         this.course = new Course()                 // peaks, arches, a tunnel and a timed lap of gates
         this.desk = new Desk()                     // the computer by the airstrip: the résumé on its screen
+        this.room = new Room()                     // the cabin by the start, the room under the island, the doors to the other sites
         this.letters = new Letters()               // the name in big blocks you can knock over
         this.sky = new Sky()                       // the blimp with the links, and the secret ring
         this.look = new Look()                     // folio-2025's lighting, fog and materials, our colours

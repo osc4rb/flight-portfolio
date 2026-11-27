@@ -119,13 +119,13 @@ export class Hud
         c.classList.remove('pop'); void c.offsetWidth; c.classList.add('pop')
     }
 
-    panel(section, color)
+    panel(section, color, back)
     {
         const p = this.$('h-panel'), ext = h => /^https?:/.test(h) ? ' target="_blank" rel="noopener"' : ''
         const items = (section.items || []).map(it => it.sub ? `<li class="sub">${esc(it.sub)}</li>`
             : `<li><span class="when">${esc(it.when || '')}</span><p>${it.href && !/^\?/.test(it.href) ? `<a href="${esc(it.href)}"${ext(it.href)}><b>${esc(it.lead)}</b></a>` : `<b>${esc(it.lead || '')}</b>`} ${md(it.text || '')}</p></li>`).join('')
         p.innerHTML = `<div class="h-card" style="--c:${color}"><header><h2 id="h-ptitle">${esc(section.title)}</h2><button type="button" class="h-x" data-close aria-label="Close">×</button></header>
-          <ul>${items}</ul><footer><a href="../index.html#${esc(section.id)}">Open on the résumé page</a><button type="button" class="h-btn" data-close>Back to the island <kbd>E</kbd></button></footer></div>`
+          <ul${section.plain ? ' class="plain"' : ''}>${items}</ul><footer><a href="../index.html#${esc(section.id)}">Open on the résumé page</a><button type="button" class="h-btn" data-close>${esc(back || 'Back to the island')} <kbd>E</kbd></button></footer></div>`
         p.hidden = false
         p.classList.remove('in'); void p.offsetWidth; p.classList.add('in')
         this.game.sound && (this.game.sound.pop(true), this.game.sound.whoosh())
@@ -137,7 +137,9 @@ export class Hud
     closePanel()
     {
         const p = this.$('h-panel'); if(p.hidden) return
-        p.hidden = true; this.game.modes.lock(false)
+        p.hidden = true
+        const room = this.game.room
+        if(room && room.state !== 'off') room.panelClosed(); else this.game.modes.lock(false)
         this.game.sound && this.game.sound.pop(false)
         const st = this.game.stations; if(st && st.talker) { st.talker.line++; st.talker = null }     // greet again with the next line
         this.game.canvasElement.focus && this.game.canvasElement.focus()
@@ -171,7 +173,13 @@ export class Hud
         clearTimeout(this.linksT); this.linksT = setTimeout(() => { el.hidden = true }, 9000)
     }
 
-    deskBack(on) { this.$('h-deskback').hidden = !on }
+    deskBack(on, text)
+    {
+        const b = this.$('h-deskback')
+        if(this.deskBackText === undefined) this.deskBackText = b.innerHTML
+        b.innerHTML = text ? `${esc(text)} <kbd>Esc</kbd>` : this.deskBackText
+        b.hidden = !on
+    }
 
     // the lap readout while flying: next gate, lap time, best time on this device
     race(r)

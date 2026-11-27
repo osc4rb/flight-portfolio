@@ -128,16 +128,19 @@ export class Desk
     }
 
     // ---------------------------------------------------------------- sit down, stand up
-    use()
+    // opts (the room's computer): { screen, scale, back(), backLabel }; without them, this desk by the airstrip
+    use(opts = {})
     {
         if(this.state !== 'idle') return
         if(innerWidth < 700) { location.href = '../index.html'; return }         // a phone screen is too small for a screen in a screen
         const g = this.game
         this.frame()
+        this.opts = opts
+        this.active = { screen: opts.screen || this.screen, scale: opts.scale || SPOT.scale }
         this.state = 'in'; this.t = 0
         g.modes.lock(true); g.modes.desk = this
         g.walker.setActive(false)
-        g.hud.prompt(null); g.hud.say(null); g.hud.deskBack(true)
+        g.hud.prompt(null); g.hud.say(null); g.hud.deskBack(true, opts.backLabel)
         g.sound.whoosh()
         const cam = g.view.camera
         this.from = { pos: cam.position.clone(), quat: cam.quaternion.clone(), fov: cam.fov }
@@ -160,9 +163,10 @@ export class Desk
     // the camera pose where the screen just fills the view
     target(cam)
     {
-        const S = SPOT.scale, w = SCREEN.w * S, h = SCREEN.h * S, fov = 25, tan = Math.tan(fov * Math.PI / 360)
+        const S = this.active.scale, w = SCREEN.w * S, h = SCREEN.h * S, fov = 25, tan = Math.tan(fov * Math.PI / 360)
         const d = Math.max(h / (2 * tan), w / cam.aspect / (2 * tan)) * 1.03
-        const c = this.screen.getWorldPosition(new THREE.Vector3()), n = new THREE.Vector3(0, 0, 1).applyQuaternion(this.screen.getWorldQuaternion(new THREE.Quaternion()))
+        const scr = this.active.screen
+        const c = scr.getWorldPosition(new THREE.Vector3()), n = new THREE.Vector3(0, 0, 1).applyQuaternion(scr.getWorldQuaternion(new THREE.Quaternion()))
         const pos = c.clone().addScaledVector(n, d), m = new THREE.Matrix4().lookAt(pos, c, new THREE.Vector3(0, 1, 0))
         return { pos, quat: new THREE.Quaternion().setFromRotationMatrix(m), fov }
     }
@@ -188,6 +192,12 @@ export class Desk
             if(this.t >= 1)
             {
                 if(this.state === 'in') { this.state = 'on'; this.wrap.style.opacity = 1; this.wrap.style.pointerEvents = 'auto'; g.achievements && g.achievements.unlock('computer') }
+                else if(this.opts.back)
+                {
+                    this.state = 'idle'; this.css.domElement.hidden = true; g.modes.desk = null
+                    this.opts.back()
+                    return
+                }
                 else
                 {
                     this.state = 'idle'; g.cameraOverride = null; this.css.domElement.hidden = true
@@ -197,9 +207,9 @@ export class Desk
             }
         }
         // lay the page on the screen
-        const S = SPOT.scale
-        this.screen.getWorldPosition(this.obj.position)
-        this.screen.getWorldQuaternion(this.obj.quaternion)
+        const S = this.active.scale, scr = this.active.screen
+        scr.getWorldPosition(this.obj.position)
+        scr.getWorldQuaternion(this.obj.quaternion)
         this.obj.scale.setScalar(SCREEN.w * S / this.px)
         this.css.render(this.cssScene, g.view.camera)
     }

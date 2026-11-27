@@ -217,13 +217,34 @@ window.FLIGHT_SITE = {
     // empty = times stay on each visitor's device
     race: { board: "Fastest laps", yourLap: "Your lap", name: "Your name", post: "Post", posted: "Posted", close: "Close" },
     leaderboard: { url: "", key: "" },
+    // doors (world/game/Room.js): walk up and a sign shows `tab`, `name` and `go`; `label` floats over the door.
+    // The one without href is the cabin by the start: it leads into the room. The others open those sites.
+    doors: [
+      { id: "room",    tab: "Door 1", name: "My room",          label: "Room",    go: "Go in", color: "#f2c94c" },
+      { id: "bullets", tab: "Door 2", name: "Falcon Bullets",   label: "Bullets", go: "Go in", color: "#5fb3cf", href: "https://osc4rb.github.io/squad-tools/bullets/" },
+      { id: "matcher", tab: "Door 3", name: "Coaching matcher", label: "Matcher", go: "Go in", color: "#9fe0b7", href: "https://github.com/osc4rb/martinson-coaching-match" },
+      { id: "cs37",    tab: "Door 4", name: "CS-37 site",       label: "CS-37",   go: "Go in", color: "#ef8a6f", href: "https://osc4rb.github.io/squad-tools/" },
+    ],
+    // the room: hover labels and panel titles for the computer, board, shelf and phone; the shelf holds the items of
+    // `home` whose lead is in `papers`
+    room: {
+      back: "← Back", backTitle: "Back to the island (Esc)", panelBack: "Back", screenBack: "← Back",
+      labels: { computer: "CV", board: "Projects", shelf: "Papers", phone: "Contact" },
+      papers: [
+        "ADS-B position verification, solo paper.",
+        "National Collegiate Research Conference 2027, Harvard.",
+        "Western Regional Honors Conference, UNLV.",
+        "Journal of Student Research.",
+      ],
+    },
     from: "Oscar",
     quests: [
       { goal: "takeoff",  at: "jet",      text: "Hey, welcome to my island! The jet is right behind you: walk up to it, press E, then hold W to take off." },
       { goal: "lap",      at: "circuit",  text: "Nice. See the yellow ring over the runway? Fly through it to start a lap, then follow the gates round the mountains." },
       { goal: "land",                    text: "Good flying! Now bring it down on the runway: throttle back with B and keep the wings level." },
       { goal: "computer", at: "computer", text: "The computer where you started has my résumé on its screen. Walk up to it and press E." },
-      { goal: "people",   at: "people",   text: "Five people in town each hold one part of what I do. Go and say hi to all of them." },
+      { goal: "room",     at: "room",     text: "The cabin beside the computer is my room. Walk up to the door and go in." },
+      { goal: "people",   at: "people",  text: "Five people in town each hold one part of what I do. Go and say hi to all of them." },
       { goal: "blimp",    at: "blimp",    text: "The blimp circling the island carries my links. Fly close and they pop up." },
       { goal: "secret",                  text: "Last one, if you like a challenge: a gold ring is hidden high above the island." },
     ],

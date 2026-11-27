@@ -58,7 +58,7 @@ def finish(o, color, name=None, bevel=0.0, segs=3, smooth=0.6):
         md = o.modifiers.new('bevel', 'BEVEL'); md.width = bevel; md.segments = segs; md.limit_method = 'ANGLE'
         bpy.ops.object.modifier_apply(modifier=md.name)
     if smooth:
-        bpy.ops.object.shade_auto_smooth(angle=smooth)
+        bpy.ops.object.shade_smooth_by_angle(angle=smooth)
     o.select_set(False)
     return o
 
@@ -418,7 +418,200 @@ def garage():
     export('garage')
 
 
+def plane(name, w, h, loc, rot, color):
+    bpy.ops.mesh.primitive_plane_add(size=1, location=loc, rotation=rot)
+    o = bpy.context.active_object; o.scale = (w, h, 1)
+    return finish(o, color, name, smooth=0)
+
+
+# ------------------------------------------------------------------------------------------------ room (Room.js)
+def room():
+    """The room you walk into from the cabin: a floor and two walls (back +Y, left -X), open toward the camera corner
+    (-Y, +X = glTF +Z, +X). Room.js finds the clickable things by node name: Computer + Screen (the CV, a CSS3D page
+    laid on Screen, 1.6 x 0.9 like the desk), Board + BoardFace (projects drawn on it), Shelf (papers), Phone (contact)."""
+    reset()
+    wall, trim, wood, plank2, dark, metal = '#e9dcc6', '#cbb89a', '#b98a5e', '#a97b52', '#2a2928', '#9aa0a6'
+    W, H = 3.0, 2.8                                                   # half width, wall height
+    planks = []
+    for i in range(12):
+        x = -W + 0.25 + i * 0.5
+        planks.append(box('plank', (0.49, 2 * W, 0.12), (x, 0, -0.06), wood if i % 2 else plank2, 0.01, 1))
+    floor = join(planks, 'floor')
+    box('wallback', (2 * W + 0.2, 0.2, H), (0, W + 0.1, H / 2), wall, 0.02)
+    box('wallleft', (0.2, 2 * W + 0.2, H), (-W - 0.1, 0, H / 2), wall, 0.02)
+    box('skirtback', (2 * W, 0.04, 0.12), (0, W - 0.02, 0.06), trim, 0.01)
+    box('skirtleft', (0.04, 2 * W, 0.12), (-W + 0.02, 0, 0.06), trim, 0.01)
+    box('rug', (2.6, 1.9, 0.02), (0.2, 0.2, 0.01), '#6f8fa8', 0.01)
+    box('rugedge', (2.3, 1.6, 0.025), (0.2, 0.2, 0.012), '#d8c9a8', 0.01)
+
+    # desk against the back wall, with the computer
+    box('desktop', (1.9, 0.8, 0.05), (1.1, 2.5, 0.75), wood, 0.012)
+    for x, y in [(0.22, 2.17), (1.98, 2.17), (0.22, 2.83), (1.98, 2.83)]:
+        box('deskleg', (0.06, 0.06, 0.73), (x, y, 0.365), dark, 0.01)
+    box('drawer', (0.45, 0.7, 0.5), (1.7, 2.5, 0.45), wood, 0.012)
+    comp = [box('bezel', (1.68, 0.06, 0.98), (1.0, 2.72, 1.45), dark, 0.025, 4),
+            box('neck', (0.09, 0.06, 0.3), (1.0, 2.78, 0.9), dark, 0.015),
+            box('foot', (0.5, 0.3, 0.025), (1.0, 2.7, 0.785), dark, 0.01),
+            box('keyboard', (0.8, 0.26, 0.025), (1.0, 2.3, 0.79), '#3a3937', 0.008),
+            sphere('mouse', 0.055, (1.6, 2.32, 0.785), '#3a3937', (0.65, 1, 0.38))]
+    join(comp, 'Computer')
+    plane('Screen', 1.6, 0.9, (1.0, 2.685, 1.45), (math.pi / 2, 0, 0), '#100f0f')
+    cyl('mug', 0.05, 0.11, (0.4, 2.3, 0.83), '#f2c94c', verts=20, r2=0.045)
+    cyl('lampbase', 0.08, 0.02, (0.35, 2.75, 0.785), dark)
+    cyl('lamparm', 0.012, 0.45, (0.35, 2.7, 1.0), dark, rot=(0.3, 0, 0), verts=10)
+    cyl('lampshade', 0.1, 0.15, (0.35, 2.58, 1.2), '#f2c94c', rot=(1.1, 0, 0), r2=0.035)
+    # chair
+    box('seat', (0.5, 0.5, 0.07), (1.0, 1.75, 0.48), '#3d5a73', 0.03, 4)
+    box('chairback', (0.5, 0.07, 0.55), (1.0, 1.5, 0.85), '#3d5a73', 0.03, 4)
+    cyl('post', 0.03, 0.4, (1.0, 1.75, 0.25), metal, verts=12)
+    for k in range(5):
+        a = k / 5 * math.tau
+        box('spoke', (0.3, 0.05, 0.035), (1.0 + math.cos(a) * 0.15, 1.75 + math.sin(a) * 0.15, 0.06), metal, 0.01).rotation_euler.z = a
+
+    # corkboard on the back wall: a frame, and BoardFace (1.5 x 1.0) that Room.js draws the projects on
+    board = [box('frame-t', (1.62, 0.06, 0.06), (-1.3, W - 0.03, 2.06), wood, 0.01),
+             box('frame-b', (1.62, 0.06, 0.06), (-1.3, W - 0.03, 1.0), wood, 0.01),
+             box('frame-l', (0.06, 0.06, 1.06), (-2.08, W - 0.03, 1.53), wood, 0.01),
+             box('frame-r', (0.06, 0.06, 1.06), (-0.52, W - 0.03, 1.53), wood, 0.01),
+             box('cork', (1.5, 0.03, 1.0), (-1.3, W - 0.015, 1.53), '#c49a6c', 0.005)]
+    join(board, 'Board')
+    plane('BoardFace', 1.5, 1.0, (-1.3, W - 0.035, 1.53), (math.pi / 2, 0, 0), '#c49a6c')
+    # a low chest under the board, with a plant
+    box('chest', (1.3, 0.45, 0.55), (-1.3, W - 0.25, 0.275), '#8d6a4b', 0.02)
+    cyl('pot', 0.13, 0.22, (-0.85, W - 0.25, 0.66), '#c9895a', r2=0.1)
+    for dx, dy, dz, s in [(0, 0, 0.9, 0.16), (0.08, 0.03, 0.98, 0.12), (-0.07, -0.02, 1.0, 0.11)]:
+        bpy.ops.mesh.primitive_ico_sphere_add(radius=s, subdivisions=2, location=(-0.85 + dx, W - 0.25 + dy, dz))
+        finish(bpy.context.active_object, '#63a842', 'leaves', smooth=0)
+
+    # bookshelf on the left wall: the papers
+    sx, sy, sw, sd, sh = -W + 0.2, 1.6, 1.3, 0.38, 1.9
+    shelf = [box('side', (sd, 0.04, sh), (sx, sy - sw / 2, sh / 2), wood, 0.01),
+             box('side', (sd, 0.04, sh), (sx, sy + sw / 2, sh / 2), wood, 0.01),
+             box('back', (0.02, sw, sh), (sx - sd / 2 + 0.01, sy, sh / 2), plank2, 0.005)]
+    cols = ['#d9534f', '#3d5a73', '#f2c94c', '#ece6d6', '#5b8c5a', '#8a5a8c', '#e07b39', '#2a2928']
+    n = 0
+    for k, z in enumerate((0.02, 0.48, 0.94, 1.4, 1.88)):
+        shelf.append(box('board', (sd, sw, 0.04), (sx, sy, z), wood, 0.008))
+        if z > 1.8:
+            break
+        y = sy - sw / 2 + 0.06
+        while y < sy + sw / 2 - 0.12:
+            t = 0.04 + (n * 37 % 5) * 0.012
+            h = 0.28 + (n * 53 % 7) * 0.018
+            if k == 1 and 0.3 < y - (sy - sw / 2) < 0.55:                 # a lying stack of papers
+                for j in range(4):
+                    shelf.append(box('paper', (0.3, 0.22, 0.012), (sx + 0.02, y + 0.1, z + 0.03 + j * 0.014), '#f4f0e6', 0.002, 1))
+                y += 0.3; continue
+            shelf.append(box('book', (0.26, t, h), (sx + 0.02, y + t / 2, z + 0.02 + h / 2), cols[n % len(cols)], 0.006, 1))
+            y += t + 0.006; n += 1
+    join(shelf, 'Shelf')
+
+    # window on the left wall, with a side table and the phone under it
+    box('winframe', (0.08, 1.2, 1.0), (-W + 0.02, -0.6, 1.65), '#f4f0e6', 0.01)
+    box('glass', (0.02, 1.04, 0.84), (-W + 0.065, -0.6, 1.65), '#bfe3f2', 0)
+    box('mullion', (0.03, 0.04, 0.84), (-W + 0.075, -0.6, 1.65), '#f4f0e6', 0.005)
+    box('sill', (0.18, 1.3, 0.04), (-W + 0.09, -0.6, 1.13), '#f4f0e6', 0.008)
+    box('tabletop', (0.6, 0.6, 0.04), (-2.5, -0.6, 0.62), wood, 0.01)
+    for dx, dy in [(-0.25, -0.25), (0.25, -0.25), (-0.25, 0.25), (0.25, 0.25)]:
+        box('tableleg', (0.04, 0.04, 0.6), (-2.5 + dx, -0.6 + dy, 0.3), dark, 0.008)
+    red = '#c8443b'
+    phone = [box('body', (0.26, 0.3, 0.1), (-2.5, -0.6, 0.69), red, 0.03, 3),
+             box('cradle', (0.08, 0.26, 0.05), (-2.5, -0.6, 0.765), red, 0.015),
+             cyl('dial', 0.085, 0.015, (-2.5, -0.68, 0.745), '#ece6d6', rot=(0.35, 0, 0), verts=24),
+             cyl('grip', 0.025, 0.24, (-2.5, -0.6, 0.83), red, rot=(math.pi / 2, 0, 0), verts=12),
+             sphere('ear', 0.045, (-2.5, -0.72, 0.81), red, (1, 1, 0.7)),
+             sphere('mouth', 0.045, (-2.5, -0.48, 0.81), red, (1, 1, 0.7))]
+    join(phone, 'Phone')
+    # floor lamp and a beanbag in the open corner
+    cyl('flbase', 0.16, 0.03, (-2.3, -2.2, 0.015), dark)
+    cyl('flpole', 0.015, 1.5, (-2.3, -2.2, 0.78), dark, verts=10)
+    cyl('flshade', 0.24, 0.3, (-2.3, -2.2, 1.6), '#ece6d6', r2=0.14)
+    sphere('beanbag', 0.45, (-1.6, -1.4, 0.3), '#e07b39', (1.1, 1, 0.68))
+    sphere('cushion', 0.2, (-1.5, -1.45, 0.62), '#f2c94c', (1.2, 1, 0.5))
+    # a poster beside the board and a clock on the left wall
+    box('poster', (0.5, 0.02, 0.7), (2.45, W - 0.01, 1.7), '#3d5a73', 0.005)
+    box('posterplane', (0.36, 0.025, 0.22), (2.45, W - 0.01, 1.82), '#f2c94c', 0.004)
+    cyl('clock', 0.17, 0.04, (-W + 0.02, 0.9 - 0.95, 2.35), '#ece6d6', rot=(0, math.pi / 2, 0), verts=28)
+    for o in bpy.context.scene.objects:
+        if o.type == 'MESH':
+            o.select_set(True); bpy.context.view_layer.objects.active = o
+            bpy.ops.object.transform_apply(location=False, rotation=True, scale=True); o.select_set(False)
+            if o.name not in ('Screen', 'BoardFace'):
+                densify(o, 0.25)
+    bake_ao(0.7, 0.42)
+    export('room')
+
+
+# ------------------------------------------------------------------------------------------------ cabin (Room.js door)
+def cabin():
+    """The small house by the start disc that the room is inside. Door on the -Y side (glTF +Z), named Door."""
+    reset()
+    log, roof, trim, stone = '#b07a4f', '#7d4b3a', '#f4f0e6', '#a9a39a'
+    box('base', (5.4, 4.4, 0.3), (0, 0, 0.15), stone, 0.04)
+    logs = []
+    for i in range(9):
+        z = 0.42 + i * 0.27
+        logs.append(box('log', (5.0, 0.26, 0.26), (0, -2.0, z), log, 0.1, 3))
+        logs.append(box('log', (5.0, 0.26, 0.26), (0, 2.0, z), log, 0.1, 3))
+        logs.append(box('log', (0.26, 4.26, 0.26), (-2.45, 0, z), log, 0.1, 3))
+        logs.append(box('log', (0.26, 4.26, 0.26), (2.45, 0, z), log, 0.1, 3))
+    join(logs, 'walls')
+    # gables and the roof
+    for y in (-2.0, 2.0):
+        slab('gable', [(-2.55, y, 2.72), (2.55, y, 2.72), (0, y, 4.1)], 0.24, log)
+    for s in (-1, 1):
+        r = box('roof', (3.3, 5.2, 0.16), (s * 1.3, 0, 3.5), roof, 0.03)
+        r.rotation_euler.y = s * math.atan2(1.38, 2.55)
+    box('ridge', (0.24, 5.3, 0.22), (0, 0, 4.17), roof, 0.04)
+    box('chimney', (0.6, 0.6, 1.6), (1.4, 1.0, 3.8), stone, 0.04)
+    # door (Room.js walks you in through it) and windows
+    box('doorframe', (1.2, 0.16, 2.2), (0, -2.08, 1.4), trim, 0.02)
+    box('Door', (1.0, 0.12, 2.05), (0, -2.12, 1.33), '#3d5a73', 0.02)
+    sphere('knob', 0.05, (0.36, -2.2, 1.3), '#f2c94c')
+    box('step', (1.6, 0.7, 0.18), (0, -2.55, 0.09), stone, 0.03)
+    for x in (-1.6, 1.6):
+        box('winframe', (0.9, 0.16, 0.8), (x, -2.08, 1.6), trim, 0.02)
+        box('Window', (0.74, 0.18, 0.64), (x, -2.08, 1.6), '#ffd98a', 0.01)
+    box('sidewin', (0.16, 0.9, 0.8), (-2.53, 0.4, 1.6), trim, 0.02)
+    box('Window', (0.18, 0.74, 0.64), (-2.53, 0.4, 1.6), '#ffd98a', 0.01)
+    for o in bpy.context.scene.objects:
+        if o.type == 'MESH':
+            o.select_set(True); bpy.context.view_layer.objects.active = o
+            bpy.ops.object.transform_apply(location=False, rotation=True, scale=True); o.select_set(False)
+            densify(o, 0.5)
+    ground()
+    bake_ao(1.0, 0.45)
+    export('cabin')
+
+
+# ------------------------------------------------------------------------------------------------ doorway (Room.js doors)
+def doorway():
+    """A free-standing door in a frame on a stone step, ajar. Room.js tints the node named Panel per site."""
+    reset()
+    trim, stone = '#f4f0e6', '#a9a39a'
+    box('step', (1.9, 0.9, 0.2), (0, 0, 0.1), stone, 0.03)
+    box('post', (0.18, 0.22, 2.5), (-0.68, 0, 1.45), trim, 0.03)
+    box('post', (0.18, 0.22, 2.5), (0.68, 0, 1.45), trim, 0.03)
+    box('lintel', (1.6, 0.26, 0.22), (0, 0, 2.75), trim, 0.03)
+    # the panel, hinged on the left post: built with its left edge at the origin, then swung open
+    p = box('Panel', (1.14, 0.08, 2.4), (0.57, 0, 0), '#3d5a73', 0.02)
+    bpy.context.view_layer.objects.active = p; p.select_set(True)
+    bpy.ops.object.transform_apply(location=True, rotation=False, scale=False); p.select_set(False)
+    p.location = (-0.6, -0.02, 1.42); p.rotation_euler.z = -0.55
+    a = -0.55
+    sphere('knob', 0.045, (-0.6 + 1.0 * math.cos(a) + 0.07 * math.sin(a), -0.02 + 1.0 * math.sin(a) - 0.07 * math.cos(a), 1.4), '#f2c94c')
+    box('dark', (1.16, 0.02, 2.42), (0, 0.06, 1.42), '#1d1c1b', 0)
+    for o in bpy.context.scene.objects:
+        if o.type == 'MESH':
+            o.select_set(True); bpy.context.view_layer.objects.active = o
+            bpy.ops.object.transform_apply(location=True, rotation=True, scale=True); o.select_set(False)
+            densify(o, 0.3)
+    ground()
+    bake_ao(0.8, 0.45)
+    export('doorway')
+
+
 only = sys.argv[sys.argv.index('--') + 2:] if '--' in sys.argv else []
-for fn in (desk, fountain, arch, truck, jet, garage):
+for fn in (desk, fountain, arch, truck, jet, garage, room, cabin, doorway):
     if not only or fn.__name__ in only:
         fn()

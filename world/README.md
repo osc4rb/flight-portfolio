@@ -121,6 +121,20 @@ kept read-only in `../vendor/folio-2025/` for reference.
   Viewports narrower than 700 px open the page instead. The technique follows Henry Heffernan's
   portfolio-website (github.com/henryjeff/portfolio-website, MIT, © Henry Heffernan): a CSS3D iframe on a
   monitor plane and a camera move into it. No code or assets were copied.
+- `Room.js`: the cabin by the start disc, the room under the island, and the doors to the other sites.
+  - Walk up to a door and a sign slides up from the bottom: a tab ("Door 1"), the name and a "Go in" button, E or
+    Enter. Its structure follows husam.world's exit sign, measured from his CSS (a tab over a framed panel, a
+    key-capped button, a spring in from below); the colours and type are ours. A circle in the door's colour grows
+    from the door with the name, his wipe's idea, then the callback runs.
+  - The cabin's door leads to the room, `room.glb` 400 m under the start disc, so it never shows from the island. A
+    fixed orbit camera looks in over the open corner; drag nudges it, the wheel zooms a little. Look keeps one
+    daylight and a dark background there; the shadows follow the room.
+  - The computer, board, shelf and phone glow under the pointer with a one-word label. A click dives the camera in
+    and opens a panel: Projects (`home.projects`), Papers (the `home` items listed in `world.room.papers`) and
+    Contact (`contact`). On wide screens the panel docks right and the thing sits in the left half. The computer
+    reuses `Desk.js` (`use({ screen, scale, back })`), so the live CV lies on the room's screen.
+  - The other doors set `location.href` to Falcon Bullets, the coaching matcher and the CS-37 site. Words:
+    `site.js` → `world.doors`, `world.room`.
 - `Stations.js`: the five résumé people, labels, rings, and coin pickup.
 - `Modes.js`: on foot, driving or flying. What E does, getting in and out, locking input while a panel is open.
 - `Hud.js`: "Just the CV" (top right, opens `../index.html`), sound toggle, controls, the E prompt, the speech bubble, résumé panels, toasts, flight
@@ -190,6 +204,11 @@ multiplies it in.
   scale 1, so flight and the collider are unchanged; `planes.js` is the fallback.
 - `garage.glb` (1.3 MB): a ribbed Quonset hangar with half-open doors, hazard stripes, an office annex, crates and a
   workbench. It sits at 1:1, its doors at the runway's edge.
+- `room.glb` (1.5 MB): the room: a plank floor, two walls, a window, a desk with the computer (`Computer` and a
+  `Screen` plane like the desk's), a corkboard (`Board` and `BoardFace`, which Room.js draws the projects on), a
+  bookshelf (`Shelf`), a side table with a phone (`Phone`), a rug, a beanbag, a floor lamp, a chest and a plant
+- `cabin.glb` (1.0 MB): a log cabin with a gable roof, a chimney, lit windows and a `Door`
+- `doorway.glb` (0.1 MB): a free-standing door frame on a step, the door ajar; Room.js tints `Panel` per site
 - `arch.glb` (1.3 MB): a unit sea arch (radius 1, tube 0.2, legs thickened like `Course.js`'s collision shape),
   painted rock and moss, scaled to each arch
 

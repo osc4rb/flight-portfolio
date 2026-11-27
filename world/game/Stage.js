@@ -45,6 +45,9 @@ const MODELS = {
     arch: 'models/arch.glb',
     jet: 'models/jet.glb',
     garage: 'models/garage.glb',
+    room: 'models/room.glb',
+    cabin: 'models/cabin.glb',
+    doorway: 'models/doorway.glb',
     tents: KIT.racing + 'decoration-tents.glb',
 }
 
@@ -412,7 +415,8 @@ export class Stage
     update()
     {
         const t = this.game.ticker.elapsed, dt = this.game.ticker.delta, f = this.game.view.focusPoint.smoothedPosition
-        this.sun.position.copy(f).add(this.sunOffset); this.sun.target.position.copy(f)
+        const sf = (this.game.room && this.game.room.sunAt) || f          // in the room the shadows follow the room
+        this.sun.position.copy(sf).add(this.sunOffset); this.sun.target.position.copy(sf)
         this.water.position.x = f.x; this.water.position.z = f.z
         for(const c of this.coins) if(!c.taken) { c.obj.rotation.y = t * 2.2; c.obj.position.y = c.y + Math.sin(t * 2 + c.x) * 0.15 }
         for(const a of this.animated) { a.obj.position.x += a.drift * dt; if(a.obj.position.x > 220) a.obj.position.x = - 220 }

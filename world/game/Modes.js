@@ -33,6 +33,12 @@ export class Modes
         j.addTarget(this.game.jet.group, 'jet', () => this.interact())
         j.addTarget(this.game.desk.group, 'computer', () => this.game.desk.use())
         j.addTarget(this.game.sky.blimp, 'blimp', () => this.game.sky.showLinks())
+        const room = this.game.room
+        if(room)
+        {
+            room.start()
+            for(const d of room.doors) { const t = j.addTarget(d.obj, 'door', () => room.go(d)); t.at = () => d.front.clone() }
+        }
         this.game.mode = 'foot'
         // you start in the opening disc between the jet and the computer (Desk.js SPOT), facing the camera
         this.game.walker.moveTo(this.game.jet.door.add(new THREE.Vector3(2.5, 1.2, 3.6)), Math.PI * 0.75)
@@ -57,6 +63,8 @@ export class Modes
         {
             if(st) return { label: 'Talk · ' + st.section.title, run: () => g.stations.open(st) }
             const p = g.walker.position
+            const door = g.room && g.room.near(p)
+            if(door) return { label: door.name, door, run: () => g.room.go(door) }
             if(p.distanceTo(g.physicalVehicle.position) < 4) return { label: 'Drive the truck', run: () => this.enter('drive') }
             if(p.distanceTo(g.jet.door) < 5 && g.jet.state.ground) return { label: 'Fly the jet', run: () => this.enter('fly') }
             if(p.distanceTo(g.desk.front) < 3.5) return { label: 'Use the computer', run: () => g.desk.use() }
@@ -78,7 +86,7 @@ export class Modes
         const a = this.action(); if(a) a.run()
     }
 
-    close() { if(this.game.course && this.game.course.result) this.game.course.closeResult(); else if(this.game.map && this.game.map.open) this.game.map.close(); else if(this.desk) this.desk.leave(); else this.game.hud.closePanel() }
+    close() { if(this.game.course && this.game.course.result) this.game.course.closeResult(); else if(this.game.map && this.game.map.open) this.game.map.close(); else if(this.desk) this.desk.leave(); else if(this.game.room && this.game.room.state !== 'off' && this.game.hud.$('h-panel').hidden) this.game.room.close(); else this.game.hud.closePanel() }
 
     enter(mode)
     {
@@ -132,7 +140,8 @@ export class Modes
     refreshPrompt()
     {
         const a = this.action()
-        this.game.hud.prompt(a ? a.label : null)
+        this.game.hud.prompt(a && !a.door ? a.label : null)
+        this.game.room && this.game.room.sign(a && a.door || null)
         const b = this.game.inputs.interactiveButtons
         if(a) b.addItems([ 'interact' ]); else b.removeItems([ 'interact' ])
     }

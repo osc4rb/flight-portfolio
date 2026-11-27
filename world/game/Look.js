@@ -232,14 +232,18 @@ export class Look
             if(p.value instanceof THREE.Color) p.value.lerpColors(pa[k], pb[k], t)
             else p.value = pa[k] + (pb[k] - pa[k]) * t
         }
+        // the room (Room.js) keeps one daylight, the sun coming in over the open corner
+        const inRoom = !!(g.room && g.room.bg)
+        if(inRoom) for(const k in this.properties) { const p = this.properties[k], v = PRESETS.day[k]; if(p.value instanceof THREE.Color) p.value.copy(v); else p.value = v }
         const P = this.properties, L = this.lighting, F = this.fog
         const pr = this.progress
-        this.nightUniform.value = THREE.MathUtils.smoothstep(pr, 0.6, 0.7) * (1 - THREE.MathUtils.smoothstep(pr, 0.84, 0.94))
+        this.nightUniform.value = inRoom ? 0 : THREE.MathUtils.smoothstep(pr, 0.6, 0.7) * (1 - THREE.MathUtils.smoothstep(pr, 0.84, 0.94))
 
         // sun direction swings with the day (Ligthing.js)
         L.spherical.theta = L.theta + Math.sin(- (this.progress + 9 / 16) * Math.PI * 2) * L.thetaAmplitude
         L.spherical.phi = L.phi + Math.cos(- (this.progress + 9 / 16) * Math.PI * 2) * 0.5 * L.phiAmplitude
         L.direction.setFromSpherical(L.spherical).normalize()
+        if(inRoom) L.direction.copy(g.room.sunDir)
         g.stage.sunOffset.copy(L.direction).multiplyScalar(80)
         L.colorUniform.value.copy(P.lightColor.value)
         L.intensityUniform.value = P.lightIntensity.value
@@ -255,6 +259,7 @@ export class Look
 
         // fog (Fog.js): distances from the camera, wider in the jet
         F.colorA.value.copy(P.fogColorA.value); F.colorB.value.copy(P.fogColorB.value)
+        const rb = g.room && g.room.bg; if(rb) { F.colorA.value.copy(rb[0]); F.colorB.value.copy(rb[1]) }
         const cam = g.view.camera.position, f = g.view.focusPoint.smoothedPosition, d = cam.distanceTo(f)
         const near = this.flying ? 160 : d + 12, amp = this.flying ? 700 : 110
         F.near.value = near + P.fogNearRatio.value * amp * 0.3

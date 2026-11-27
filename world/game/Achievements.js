@@ -14,6 +14,7 @@ export const ACHIEVEMENTS = [
     [ 'land', 'Greaser', 'Land back on the runway' ],
     [ 'splash', 'Splashdown', 'Put the jet in the sea' ],
     [ 'computer', 'Screen in a screen', 'Read the résumé at the desk' ],
+    [ 'room', 'House call', 'Go into the cabin' ],
     [ 'people', 'Met everyone', 'Talk to all five people' ],
     [ 'coins', 'Coin collector', 'Pick up every coin' ],
     [ 'letters', 'Bowled over', 'Knock over a letter of the name' ],

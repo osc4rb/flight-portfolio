@@ -266,7 +266,7 @@ export class Juice
     click(t)
     {
         if(this.game.mode !== 'foot') { t.run && t.run(); return }
-        this.game.walker.goTo(t.obj.getWorldPosition(new THREE.Vector3()), () => t.run && t.run())
+        this.game.walker.goTo(t.at ? t.at() : t.obj.getWorldPosition(new THREE.Vector3()), () => t.run && t.run())
         this.game.sound && this.game.sound.pop(true)
     }
 

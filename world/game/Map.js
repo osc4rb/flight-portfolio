@@ -44,7 +44,7 @@ export class IslandMap
     show()
     {
         const g = this.game
-        if(this.open || g.reveal.active || g.desk.state !== 'idle' || !g.hud.$('h-panel').hidden) return
+        if(this.open || g.reveal.active || g.desk.state !== 'idle' || !g.hud.$('h-panel').hidden || (g.room && g.room.state !== 'off')) return
         if(!this.drawn) { this.draw(); this.drawn = true }
         this.setPins()
         this.open = true

@@ -30,6 +30,9 @@ export class Places
             spot: () => { const p = g.physicalVehicle.position; return p.clone().add(v(0, 0, 3).applyQuaternion(g.physicalVehicle.quaternion)).setY(p.y + 1) } })
         add('circuit', P.circuit, { color: '#9fe0b7', lift: 7.5, at: () => v(PODIUM.x, H(PODIUM.x, PODIUM.z), PODIUM.z),
             aim: () => g.course.gates[0].c.clone(), spot: () => v(PODIUM.x, H(PODIUM.x, PODIUM.z + 6) + 1.2, PODIUM.z + 6) })
+        if(g.room) for(const d of g.room.doors)
+            add(d.room ? 'room' : 'door-' + d.id, d.label, { color: d.color || '#f2c94c', lift: d.lift || 1.2, at: () => d.top.clone(),
+                spot: () => d.front.clone().add(v(Math.sin(d.face), 0, Math.cos(d.face)).multiplyScalar(1.5)).setY(d.front.y + 1.2) })
         add('blimp', P.blimp, { color: '#b9a6ff', lift: - 4, side: 'left', at: () => g.sky.blimp.position.clone(), spot: null })
         for(const st of g.stations.list)
         {
@@ -69,7 +72,7 @@ export class Places
     busy()
     {
         const g = this.game
-        return g.reveal.active || g.desk.state !== 'idle' || !g.hud.$('h-panel').hidden || (g.map && g.map.open)
+        return g.reveal.active || g.desk.state !== 'idle' || (g.room && g.room.state !== 'off') || !g.hud.$('h-panel').hidden || (g.map && g.map.open)
     }
 
     update()

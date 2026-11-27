@@ -86,6 +86,7 @@ button{font:inherit;cursor:pointer}
 .h-card li{display:grid;grid-template-columns:96px 1fr;gap:0 14px;margin-top:12px;font-size:15px;line-height:1.55}
 .h-card li.sub{display:block;margin-top:18px;color:var(--mu);font-weight:700}
 .h-card .when{padding-top:2px;font:12.5px/1.5 var(--mono);color:var(--mu);white-space:nowrap}
+.h-card ul.plain li{grid-template-columns:1fr}.h-card ul.plain .when{display:none}
 .h-card p{margin:0}
 .h-card b,.h-card strong{color:var(--hi);font-weight:600}
 .h-card a{color:inherit}
@@ -229,3 +230,27 @@ button{font:inherit;cursor:pointer}
 .r-list li i{font-style:normal;font-family:var(--sys);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .r-list li.me b,.r-list li.me i{color:var(--ac)}
 .r-list:empty{display:none}
+
+/* doors (Room.js): the sign that slides up at a door, after husam.world's exit sign (structure measured from his CSS:
+   a tab over a framed panel and a key-capped button, a spring in from below), in our colours */
+.r-exit{position:absolute;left:50%;bottom:max(20px,env(safe-area-inset-bottom));z-index:24;width:min(460px,calc(100vw - 32px));transform:translate(-50%,calc(100% + 70px));visibility:hidden;pointer-events:none;transition:transform .55s cubic-bezier(.4,1.6,.65,1),visibility 0s .55s}
+.r-exit.show{transform:translate(-50%,0);visibility:visible;transition:transform .55s cubic-bezier(.4,1.6,.65,1),visibility 0s}
+.r-sign{position:relative;display:flex;align-items:center;gap:14px;background:#0f6b45;color:#fff;padding:14px 14px 13px 18px;box-shadow:0 0 0 2.5px #100f0f,0 5px 0 2.5px #100f0f,inset 0 0 0 3px #0f6b45,inset 0 0 0 5px #fff}
+.r-tab{position:absolute;left:14px;bottom:calc(100% + 2px);background:#f5f0e1;color:#100f0f;font:800 13px/1 system-ui,-apple-system,"Segoe UI",sans-serif;letter-spacing:.04em;text-transform:uppercase;padding:6px 9px 5px;box-shadow:0 0 0 2.5px #100f0f}
+.r-name{flex:1;min-width:0;font:800 25px/1 system-ui,-apple-system,"Segoe UI",sans-serif;letter-spacing:.01em}
+.r-go{pointer-events:auto;flex:0 0 auto;display:flex;align-items:center;gap:8px;border:0;cursor:pointer;background:#f2c94c;color:#100f0f;font:800 16px/1 system-ui,-apple-system,"Segoe UI",sans-serif;padding:13px 14px 12px;box-shadow:0 0 0 2.5px #100f0f,0 4px 0 2.5px #100f0f}
+.r-go:active{transform:translateY(3px);box-shadow:0 0 0 2.5px #100f0f,0 1px 0 2.5px #100f0f}
+.r-go kbd{font:700 12px/1 ui-monospace,monospace;padding:3px 5px;border-radius:4px;background:rgba(16,15,15,.12)}
+@media (pointer:coarse){.r-go kbd{display:none}}
+@media (max-width:560px){.r-name{font-size:20px}.r-sign{gap:10px;padding:12px 10px 11px 14px}.r-go{padding:12px 10px 11px;font-size:14px}}
+/* the wipe: a circle in the door's colour grows from the door, with the name */
+.r-wipe{position:fixed;inset:0;z-index:80;display:flex;align-items:center;justify-content:center;pointer-events:none;visibility:hidden;background:var(--wb,#f2c94c);color:#100f0f;clip-path:circle(0 at var(--wx,50%) var(--wy,50%))}
+.r-wipe.go{visibility:visible;clip-path:circle(150vmax at var(--wx,50%) var(--wy,50%));transition:clip-path .75s cubic-bezier(.7,0,.2,1)}
+.r-wipe.out{visibility:visible;transition:clip-path .6s cubic-bezier(.7,0,.2,1)}
+.r-wipe b{font:800 clamp(40px,9vw,120px)/.9 system-ui,-apple-system,"Segoe UI",sans-serif;text-align:center;padding:0 16px;transform:translateY(20px);opacity:0;transition:transform .5s .28s cubic-bezier(.4,1.6,.65,1),opacity .3s .28s}
+.r-wipe.go b{transform:none;opacity:1}
+/* in the room: only the way back */
+.h-roomback{position:absolute;left:50%;bottom:22px;transform:translateX(-50%)}
+.h-roomback:hover{transform:translateX(-50%) translateY(-2px) scale(1.04)}
+#hud.in-room .h-mapbtn,#hud.in-room .h-cv,#hud.in-room .h-msgs,#hud.in-room .h-prompt,#hud.in-room .h-qmark,#hud.in-room .h-bubble,#hud.in-room .r-exit{display:none}
+@media (min-width:900px){#hud.in-room .h-panel{place-items:center end;padding:24px 4vw;background:none}#hud.in-room .h-card{width:min(520px,44vw)}}
