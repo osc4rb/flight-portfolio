@@ -66,7 +66,15 @@ kept read-only in `../vendor/folio-2025/` for reference.
   - It loads from `avatars.githubusercontent.com/<login>`, because `github.com/<login>.png` redirects without CORS
     headers.
   - After 1.2 s standing still, the robot turns to face the camera.
-- `CarVisual.js`: a Kenney truck on his `PhysicsVehicle` chassis, with spinning and steering wheels.
+- `CarVisual.js`: our Blender pickup on his `PhysicsVehicle` chassis, after his `World/VisualVehicle.js`. It starts in the
+  opening disc beside the jet (`Stage.js` → `START_TRUCK`, the first respawn).
+  - The wheels spin, steer and ride their own suspension; they hang down in the air.
+  - The blinkers blink while you steer, the stop lights light when you brake and the reverse lights when you back up.
+  - Boost draws two glowing trails from the back corners (his `Trails.js`).
+  - Ours: headlights with beams and a pool of light on the ground, and a roof light bar. All of them glow at night
+    (Look's `nightUniform`).
+- `Tracks.js`: his `Tracks.js` and `Trails.js`. Every wheel leaves a track in a 40 m render target that follows you; the
+  grass shortens and the ground darkens there. Ours follows the player's height, since the island has hills.
 - `Jet.js`: the F-35/F-47 from `../planes.js` with arcade flight: takeoff, landing, crash, bail out, and a chase
   camera.
   - its FOV opens from 46° to 56° with speed and kicks to about 68° on the afterburner, then goes back to his 25°
@@ -199,7 +207,8 @@ multiplies it in.
 - `desk.glb` (1.0 MB): the desk, a drawer unit, the monitor with a `Screen` plane (1.6 × 0.9), a keyboard with
   keys, a mouse, a mug, a lamp, a plant and a chair
 - `fountain.glb` (0.4 MB): a stone basin with two tiers of bowls
-- `truck.glb` (0.7 MB): a pickup, with nodes `wheel-front-left` and so on for `CarVisual`
+- `truck.glb` (1.1 MB): a lifted pickup in metres, with nodes `wheel-front-left` and so on, `headlight`, `lightbar`,
+  `taillight`, `reverse`, `blinker-left` and `blinker-right` for `CarVisual`
 - `jet.glb` (0.7 MB): our jet, built in the jet's own metres on the `planes.js` airframe's envelope. It loads at
   scale 1, so flight and the collider are unchanged; `planes.js` is the fallback.
 - `garage.glb` (1.3 MB): a ribbed Quonset hangar with half-open doors, hazard stripes, an office annex, crates and a

@@ -13,7 +13,7 @@ import gsap from 'gsap'
 import { Game } from '../engine/Game.js'
 import MeshGridMaterial, { MeshGridMaterialLine } from '../engine/Materials/MeshGridMaterial.js'
 
-const RADIUS = 7            // the disc you start in (his 3.5 m, for a 2.6 m car; ours holds the robot, the desk and the jet's cockpit)
+const RADIUS = 8.5          // the disc you start in (his 3.5 m, for a 2.6 m car; ours holds the robot, the desk, the truck and the jet's cockpit)
 // the disc's centre: the jet's parking spot (Jet.park), the walker's offset from its door (Modes.start) and the
 // disc offset from the walker (Game.js). The ring shows here before anything else has loaded.
 const START = { x: - 91.5, z: - 107 }

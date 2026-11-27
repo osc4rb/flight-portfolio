@@ -20,7 +20,7 @@ export class Modes
         this.game.inputs.events.on('respawn', (action) =>
         {
             if(!action.active || this.locked) return
-            if(this.game.mode === 'foot') this.game.hud.wipe(() => this.game.walker.moveTo(this.game.respawns.getDefault().position.clone()))
+            if(this.game.mode === 'foot') this.game.hud.wipe(() => this.game.walker.moveTo(this.home()))
             if(this.game.mode === 'fly') this.game.jet.crash('Respawn')
         })
         this.game.ticker.events.on('tick', () => this.update(), 7.5)
@@ -41,10 +41,17 @@ export class Modes
         }
         this.game.mode = 'foot'
         // you start in the opening disc between the jet and the computer (Desk.js SPOT), facing the camera
-        this.game.walker.moveTo(this.game.jet.door.add(new THREE.Vector3(2.5, 1.2, 3.6)), Math.PI * 0.75)
+        this.game.walker.moveTo(this.home(), Math.PI * 0.75)
         this.game.walker.setActive(true)
         this.game.reveal.then(() => this.game.hud.ready())
         this.refreshPrompt()
+    }
+
+    // where the robot starts: in the opening disc between the jet's door, the computer and the truck
+    home()
+    {
+        const x = - 89.5, z = - 105.2                // the jet's parked door (Jet.park) + (2.5, 3.6)
+        return new THREE.Vector3(x, this.game.stage.height(x, z) + 1.2, z)
     }
 
     activePosition()

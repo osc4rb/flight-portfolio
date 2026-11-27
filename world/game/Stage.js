@@ -54,6 +54,7 @@ const MODELS = {
 // ground colours shared by the terrain, the grass blades and the light bounce (Look.js)
 export const PALETTE = { grass: '#74b84a', grass2: '#63a842', hill: '#97ab52', sand: '#e6c88a', wet: '#c9a466' }
 
+export const START_TRUCK = { x: - 85.5, z: - 106.2 }   // the truck's spot in the opening disc (Reveal START), clear of the walker, the desk and the cabin
 export const R_LAND = 150                 // island radius (m); beach to ~175, sea beyond
 const TE = 210, SEG = 140                 // terrain half-extent and grid
 
@@ -96,8 +97,9 @@ export class Stage
         this.houses = []                       // big placed models that squash when the truck hits them (Juice)
         this.height = height
 
-        const respawn = (name, x, z, rotation = 0) => ({ name, position: new THREE.Vector3(x, height(x, z) + 1.6, z), rotation })
-        const list = [ respawn('town', 8, 14, 0), respawn('runway', -96, -112, 0) ]
+        const respawn = (name, x, z, rotation = 0, lift = 1.6) => ({ name, position: new THREE.Vector3(x, height(x, z) + lift, z), rotation })
+        // the first is the truck's start: in the opening disc beside the jet (Reveal START), nose toward the camera corner
+        const list = [ respawn('start', START_TRUCK.x, START_TRUCK.z, - Math.PI / 4, 1.0), respawn('town', 8, 14, 0), respawn('runway', -96, -112, 0) ]
         this.respawns = {
             items: list,
             getDefault: () => list[0],

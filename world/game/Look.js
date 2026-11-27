@@ -123,6 +123,7 @@ export class Look
         if(m.vertexColors) base = base.mul(vertexColor().rgb)
         if(inst) base = base.mul(instancedBufferAttribute(mesh.instanceColor).rgb)
         if(mesh.userData.slabs) base = this.slabs(base)
+        if(mesh.userData.ground && this.game.tracks) base = base.mul(float(1).sub(this.game.tracks.sample(positionWorld.xz).mul(0.3)))     // tyre tracks
         const out = new MeshDefaultMaterial({
             colorNode: base,
             // houses that hide you dissolve in a screen-door pattern (crisp, keeps colours); others blend as before

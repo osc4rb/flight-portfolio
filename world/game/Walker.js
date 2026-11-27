@@ -212,7 +212,7 @@ export class Walker
         }
 
         // fell into the sea or off the world
-        if(next.y < - 6) { this.moveTo(this.game.respawns.getDefault().position.clone()); return }
+        if(next.y < - 6) { this.moveTo(this.game.modes ? this.game.modes.home() : this.game.respawns.getDefault().position.clone()); return }
 
         this.position.set(next.x, next.y, next.z)
         this.group.position.set(next.x, next.y - this.half - this.radius, next.z)

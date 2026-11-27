@@ -18,6 +18,7 @@ import { PhysicsVehicle } from './Physics/PhysicsVehicle.js'
 import { Player } from './Player.js'
 import { Stage } from '../game/Stage.js'
 import { CarVisual } from '../game/CarVisual.js'
+import { Tracks } from '../game/Tracks.js'
 import { Walker } from '../game/Walker.js'
 import { Jet } from '../game/Jet.js'
 import { Course } from '../game/Course.js'
@@ -112,6 +113,7 @@ export class Game
         await this.stage.build((k) => progress(0.2 + k * 0.7, 'world'))
         this.sound = new Sound()
         this.juice = new Juice()
+        this.tracks = new Tracks()                 // tyre tracks (his Tracks.js): the grass and the ground read them
         this.grass = new Grass()
         for(const t of this.stage.trees.list) this.juice.addWobbler({ kind: 'tree', ...t })
         for(const h of this.stage.houses) this.juice.addWobbler({ kind: 'squash', obj: h.obj, base: h.obj.scale.x, x: h.x, z: h.z, r: h.r, y: 0, s: 1 })

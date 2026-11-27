@@ -90,7 +90,8 @@ export class Grass
         const map = texture(this.map, vec2(wx, wz).div(TE * 2).add(0.5)).level(0)
         const edge = smoothstep(Sf.mul(0.5), Sf.mul(0.5).sub(8), length(rel))
         const grow = map.g.mul(edge).mul(aRand.y)
-        const height = grow.mul(0.56), width = grow.mul(0.06).add(0.01)
+        const run = this.game.tracks ? this.game.tracks.sample(vec2(wx, wz)) : float(0)       // tyre tracks (Tracks.js)
+        const height = grow.mul(0.56).mul(float(1).sub(run.mul(0.85))), width = grow.mul(0.06).add(0.01)
 
         // wind: two travelling waves
         const wind = sin(time.mul(1.6).add(wx.mul(0.13)).add(wz.mul(0.09))).mul(0.22).add(sin(time.mul(3.3).add(wx.mul(0.5)).add(wz.mul(0.37))).mul(0.07))

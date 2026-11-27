@@ -268,35 +268,77 @@ def arch():
 
 # ------------------------------------------------------------------------------------------------ truck (CarVisual.js)
 def truck():
-    """A small pickup, front toward -Y. CarVisual finds nodes named wheel-front-* / wheel-back-* and spins each about
-    its own origin, so every wheel keeps its origin at its centre."""
+    """A lifted pickup in metres, front toward -Y, Z up from the ground. CarVisual (JS) finds these nodes by name:
+    wheel-front-* / wheel-back-* (each spun about its own origin at the wheel centre, and moved up and down with its
+    suspension), headlight, lightbar, taillight, reverse, blinker-left, blinker-right (lit by JS). The wheel centres
+    match folio-2025's PhysicsVehicle (x +-0.9 forward, z +-0.75 across, radius 0.4)."""
     reset()
-    yellow, dark, glass, tyre, hub = '#f2c94c', '#2d2c2b', '#33424d', '#1d1c1b', '#c9ccd0'
-    box('chassis', (1.62, 3.0, 0.36), (0, 0, 0.6), yellow, 0.06, 4)
-    box('cab', (1.5, 1.05, 0.72), (0, -0.25, 1.12), yellow, 0.1, 4)
-    box('hood', (1.52, 0.85, 0.28), (0, -1.12, 0.9), yellow, 0.08, 4)
-    box('windshield', (1.32, 0.05, 0.46), (0, -0.79, 1.18), glass, 0.02).rotation_euler.x = 0.25
+    yellow, dark, black, glass, tyre, rim = '#f2c94c', '#2d2c2b', '#1b1b1d', '#33424d', '#1d1c1b', '#5b5f66'
+    lamp, red, amber, white = '#fff4c2', '#e0483e', '#ffae2a', '#f4f4f0'
+    WZ, WR = 0.42, 0.42                      # wheel centre height and radius
+    box('frame', (0.9, 2.7, 0.2), (0, 0, 0.66), black, 0.03)
+    box('sill', (1.6, 3.12, 0.16), (0, 0.02, 0.94), yellow, 0.05, 3)
+    box('cab', (1.56, 1.1, 0.74), (0, -0.15, 1.38), yellow, 0.1, 4)
+    box('hood', (1.58, 0.98, 0.44), (0, -1.09, 1.21), yellow, 0.08, 4)
+    box('roof', (1.44, 0.96, 0.06), (0, -0.15, 1.77), dark, 0.03)
+    box('windshield', (1.36, 0.05, 0.5), (0, -0.71, 1.45), glass, 0.02).rotation_euler.x = 0.3
+    box('rearwindow', (1.3, 0.05, 0.38), (0, 0.41, 1.46), glass, 0.02)
     for s in (-1, 1):
-        box('sidewin', (0.05, 0.8, 0.42), (s * 0.755, -0.25, 1.2), glass, 0.02)
-    box('bedfloor', (1.5, 1.2, 0.08), (0, 0.85, 0.82), dark, 0.02)
+        box('sidewin', (0.05, 0.84, 0.4), (s * 0.785, -0.15, 1.46), glass, 0.02)
+        box('mirror', (0.08, 0.16, 0.12), (s * 0.86, -0.6, 1.4), dark, 0.02)
+    box('bedfloor', (1.5, 1.22, 0.08), (0, 0.95, 1.04), dark, 0.02)
     for s in (-1, 1):
-        box('bedside', (0.1, 1.2, 0.36), (s * 0.76, 0.85, 1.0), yellow, 0.03)
-    box('tailgate', (1.52, 0.1, 0.36), (0, 1.47, 1.0), yellow, 0.03)
-    box('bumperF', (1.7, 0.16, 0.2), (0, -1.56, 0.55), dark, 0.05)
-    box('bumperB', (1.7, 0.16, 0.2), (0, 1.56, 0.55), dark, 0.05)
+        box('bedside', (0.1, 1.22, 0.38), (s * 0.75, 0.95, 1.21), yellow, 0.03)
+        box('rail', (0.06, 1.18, 0.05), (s * 0.75, 0.95, 1.43), dark, 0.02)
+    box('tailgate', (1.56, 0.1, 0.4), (0, 1.56, 1.2), yellow, 0.03)
+    cyl('spare', 0.3, 0.2, (0, 1.0, 1.18), tyre, verts=24, bevel=0.05)
+    cyl('sparehub', 0.16, 0.22, (0, 1.0, 1.18), rim, verts=16, bevel=0.02)
+    # fender flares over each wheel
+    for x in (-1, 1):
+        for y in (-0.9, 0.9):
+            box('fender', (0.26, 1.02, 0.1), (x * 0.84, y, 0.98), black, 0.04, 3)
+    # front: grille, round headlights, blinkers, bumper and a bull bar
+    box('grille', (0.66, 0.05, 0.26), (0, -1.585, 1.2), black, 0.02)
     for s in (-1, 1):
-        box('headlight', (0.26, 0.04, 0.14), (s * 0.56, -1.55, 0.86), '#fff4c2', 0.02)
-        box('taillight', (0.16, 0.04, 0.16), (s * 0.62, 1.53, 0.98), '#e0483e', 0.02)
-    box('grille', (0.7, 0.04, 0.18), (0, -1.55, 0.82), dark, 0.02)
+        cyl('headlight', 0.12, 0.06, (s * 0.55, -1.59, 1.22), lamp, rot=(math.pi / 2, 0, 0), verts=20, bevel=0.01)
+        cyl('headring', 0.15, 0.04, (s * 0.55, -1.575, 1.22), dark, rot=(math.pi / 2, 0, 0), verts=20, bevel=0.01)
+    box('blinker-left', (0.13, 0.05, 0.08), (0.7, -1.59, 1.05), amber, 0.015)
+    box('blinker-right', (0.13, 0.05, 0.08), (-0.7, -1.59, 1.05), amber, 0.015)
+    box('bumperF', (1.72, 0.2, 0.22), (0, -1.66, 0.9), black, 0.05)
+    for s in (-1, 1):
+        cyl('bar', 0.045, 0.46, (s * 0.42, -1.8, 1.08), black, verts=12, bevel=0.0)
+    cyl('bar', 0.045, 0.94, (0, -1.8, 1.31), black, rot=(0, math.pi / 2, 0), verts=12, bevel=0.0)
+    # back: tail lights, reverse lights, rear blinkers, bumper
+    for s in (-1, 1):
+        box('taillight', (0.18, 0.05, 0.2), (s * 0.64, 1.62, 1.22), red, 0.015)
+        box('reverse', (0.1, 0.05, 0.07), (s * 0.4, 1.62, 1.3), white, 0.01)
+    box('blinker-left-rear', (0.18, 0.05, 0.07), (0.64, 1.62, 1.07), amber, 0.01)
+    box('blinker-right-rear', (0.18, 0.05, 0.07), (-0.64, 1.62, 1.07), amber, 0.01)
+    box('bumperB', (1.72, 0.2, 0.2), (0, 1.66, 0.9), black, 0.05)
+    # roof light bar: a dark bar on two feet, four lamps facing forward
+    box('barbase', (1.32, 0.2, 0.12), (0, -0.42, 1.88), black, 0.03)
+    for s in (-1, 1):
+        box('barfoot', (0.08, 0.12, 0.1), (s * 0.55, -0.4, 1.82), black, 0.01)
+    for i, x in enumerate((-0.48, -0.16, 0.16, 0.48)):
+        box('lightbar', (0.26, 0.06, 0.08), (x, -0.53, 1.88), lamp, 0.01)
     for o in bpy.context.scene.objects:
         if o.type == 'MESH':
             o.select_set(True); bpy.context.view_layer.objects.active = o
             bpy.ops.object.transform_apply(location=False, rotation=True, scale=True); o.select_set(False)
             densify(o, 0.2)
-    for name, x, y in [('wheel-front-left', -0.82, -0.98), ('wheel-front-right', 0.82, -0.98), ('wheel-back-left', -0.82, 0.98), ('wheel-back-right', 0.82, 0.98)]:
-        t = cyl(name, 0.4, 0.3, (x, y, 0.4), tyre, rot=(0, math.pi / 2, 0), verts=28, bevel=0.06)
-        h = cyl('hub', 0.2, 0.32, (x, y, 0.4), hub, rot=(0, math.pi / 2, 0), verts=16, bevel=0.02)
-        w = join([t, h], name)
+    for name, x, y in [('wheel-front-left', 0.8, -0.9), ('wheel-front-right', -0.8, -0.9), ('wheel-back-left', 0.8, 0.9), ('wheel-back-right', -0.8, 0.9)]:
+        parts = [cyl(name, WR - 0.04, 0.34, (x, y, WZ), tyre, rot=(0, math.pi / 2, 0), verts=32, bevel=0.07)]
+        for k in range(18):                  # tread blocks round the tyre
+            a = k / 18 * math.pi * 2
+            b = box('tread', (0.3, 0.12, 0.07), (x, y + (WR - 0.04) * math.cos(a), WZ + (WR - 0.04) * math.sin(a)), tyre, 0.015)
+            b.rotation_euler.x = a + math.pi / 2
+            parts.append(b)
+        parts.append(cyl('rim', 0.24, 0.36, (x, y, WZ), rim, rot=(0, math.pi / 2, 0), verts=20, bevel=0.02))
+        parts.append(cyl('cap', 0.09, 0.38, (x, y, WZ), yellow, rot=(0, math.pi / 2, 0), verts=12, bevel=0.01))
+        for p in parts:
+            p.select_set(True); bpy.context.view_layer.objects.active = p
+            bpy.ops.object.transform_apply(location=False, rotation=True, scale=True); p.select_set(False)
+        w = join(parts, name)
         bpy.context.view_layer.objects.active = w; w.select_set(True)
         bpy.ops.object.origin_set(type='ORIGIN_GEOMETRY', center='BOUNDS'); w.select_set(False)
     ground()
