@@ -71,7 +71,7 @@ const FLAT = [
     { x: 0, z: 0, w: 62, d: 62 },
     { x: 0, z: -112, w: 118, d: 16 },
 ]
-export const STATION_SPOTS = [ [ 0, 92 ], [ -96, 34 ], [ 96, 30 ], [ -78, -58 ], [ 82, -60 ] ]
+export const STATION_SPOTS = [ [ 0, 92 ], [ -96, 34 ], [ 96, 30 ], [ -70, -80 ], [ 82, -60 ] ]   // the fourth stands 35 m from the start disc
 STATION_SPOTS.forEach(([ x, z ]) => FLAT.push({ x, z, w: 13, d: 13 }))
 // the places you find by exploring, out in the hills (Room.js): the cabin, then the three doorways in site.js order
 export const HIDDEN_SPOTS = { cabin: [ - 100, 100 ], doors: [ [ - 132, - 20 ], [ 35, 128 ], [ 128, 40 ] ] }

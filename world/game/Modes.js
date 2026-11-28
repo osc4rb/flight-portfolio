@@ -166,6 +166,9 @@ export class Modes
     update()
     {
         this.tick = (this.tick || 0) + 1
+        // closeness, after his camera: 30 m in the truck (his play distance); on foot about 25 m, easing out to 27 m at a run
+        const z = this.game.view.zoom, w = this.game.walker
+        z.modeOffset = this.game.mode === 'foot' ? 0.35 - 0.15 * Math.min(1, Math.max(0, (w.speed - 2) / 5)) : 0
         if(this.tick % 10 === 0) this.refreshPrompt()
         if(this.game.mode !== 'fly') this.game.hud.$('h-flight').hidden = true
         else this.game.hud.flight(this.game.jet.state, this.game.jet.position.y - Math.max(0, this.game.stage.height(this.game.jet.position.x, this.game.jet.position.z)))

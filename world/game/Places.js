@@ -9,6 +9,7 @@ import { label } from './Stations.js'
 import { PODIUM } from './Course.js'
 
 const NEAR = { foot: 12, drive: 16, fly: 40 }          // m: closer than this, the quest arrow hides
+const SHOW = { foot: 14, drive: 22, glide: 60, fly: 80 }   // m: a label shows only this close (his show at 2.5 m; the minimap does the rest)
 const FIND = { foot: 16, drive: 20, glide: 26, fly: 34 }   // m: this close to a hidden place, you have found it
 const KEY = 'oscar-world-found'                         // the places found, kept on this device only
 
@@ -115,6 +116,7 @@ export class Places
         {
             if(p.station) { p.tag.visible = !g.reveal.active; continue }
             p.tag.visible = p.hideIn !== g.mode && !g.reveal.active && this.known(p)
+            if(p.tag.visible) { const a = p.at(), me = g.modes.activePosition(); p.tag.visible = Math.hypot(a.x - me.x, a.z - me.z) < (SHOW[g.mode] || 14) }
             if(p.tag.visible) { p.tag.position.copy(p.at()); p.tag.position.y += p.lift + Math.sin(t * 2 + p.lift) * 0.15 }
         }
 

@@ -336,7 +336,7 @@ export class View
         this.spherical.theta = Math.PI * 0.25
 
         this.spherical.radius = {}
-        this.spherical.radius.edges = { min: 15, max: 42 } // [world patch] his max is 30; our jet and runway are ~4x his car, so the camera sits farther out
+        this.spherical.radius.edges = { min: 15, max: 30 } // his max (30); the jet and the glider fly on their own chase cameras
         this.spherical.radius.current = lerp(this.spherical.radius.edges.min, this.spherical.radius.edges.max, 1 - this.zoom.smoothedRatio)
         this.spherical.radius.nonIdealRatioOffset = 9
 
@@ -695,7 +695,7 @@ export class View
             }
 
             const zoomSpeedRatio = smoothstep(focusPointSpeed, this.zoom.speedEdge.min, this.zoom.speedEdge.max)
-            this.zoom.ratio = this.zoom.baseRatio
+            this.zoom.ratio = this.zoom.baseRatio + (this.zoom.modeOffset || 0)   // [world patch] Modes.js: closer on foot
 
             if(this.focusPoint.isTracking && this.game.quality.level === 0)
                 this.zoom.ratio += this.zoom.speedAmplitude * zoomSpeedRatio

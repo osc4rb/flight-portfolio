@@ -25,6 +25,8 @@ Changed (each marked `[world patch]` in the code):
   systems we did not port: audio, achievements, tracks, weather, water and the rest.
 - `Player.js`: drives only when `game.mode === 'drive'`, and only then moves the camera and touch joystick.
 - `View.js`: the focus point follows height too, and `game.cameraOverride` lets the jet's chase camera take over.
+  `zoom.modeOffset` is added to the zoom ratio (Modes.js sets 0.35 on foot, easing to 0.2 at a run: about 25–27 m).
+  The radius cap is his 30 m again (it was 42 m from 25 Nov to 28 Nov).
   The radius cap is 42 m, not his 30, because our jet and runway are about four times his car.
 - `Viewport.js`: the pixel-ratio cap is 1.5 (his 2) and is set once, so `game/Perf.js` can lower it.
 - `Rendering.js`: keeps `scenePassColor`, so Perf.js can drop the edge blur or the bloom on slow GPUs.
