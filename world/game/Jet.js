@@ -191,6 +191,7 @@ export class Jet
             if(Math.abs(inp.pitch) < 0.05) s.pitch -= s.pitch * 0.4 * dt                      // gentle self-levelling
             s.yaw -= Math.max(- 1.1, Math.min(1.1, 9.81 * Math.tan(s.bank) / Math.max(s.v, 18) * 2.2)) * dt
             if(s.v < 17) s.pitch -= (17 - s.v) * 0.05 * dt                                     // stall: nose drops
+            if(!s.pilot) s.pitch = Math.max(- 0.7, s.pitch - 0.5 * dt)                          // nobody aboard: it noses over and comes down
             s.v = Math.min(90, Math.max(10, s.v + (thrust - 0.0035 * s.v * s.v - 9.81 * Math.sin(s.pitch)) * dt))
             const cp = Math.cos(s.pitch)
             this.position.x += Math.cos(s.yaw) * cp * s.v * dt; this.position.z -= Math.sin(s.yaw) * cp * s.v * dt; this.position.y += Math.sin(s.pitch) * s.v * dt
@@ -225,7 +226,8 @@ export class Jet
         const s = this.state
         if(this.crashing) return
         this.crashing = true
-        this.game.hud.toast(reason + '. Back to the airstrip…')
+        const glide = s.pilot && reason !== 'Respawn' && this.game.glider, from = this.position.clone(), yaw = s.yaw
+        if(s.pilot) this.game.hud.toast(glide ? reason : reason + '. Back to the airstrip…')
         if(reason === 'Splashdown') this.game.achievements && this.game.achievements.unlock('splash')
         if(reason !== 'Respawn')
         {
@@ -238,6 +240,19 @@ export class Jet
         this.game.view.roll.kick(3)
         const wasPilot = s.pilot
         s.v = 0; s.thr = 0
+        // the seat fires: you glide down from the wreck, and the jet is back at the airstrip
+        if(glide)
+        {
+            this.exit(); this.park(); this.crashing = false
+            this.game.glider.start(from, yaw, 'crash')
+            return
+        }
+        // nobody aboard (it flew on after a bail-out): the fireball, then the jet is back at the airstrip
+        if(!wasPilot && reason !== 'Respawn')
+        {
+            setTimeout(() => { this.park(); this.crashing = false }, 1200)
+            return
+        }
         this.game.hud.wipe(() =>
         {
             this.park()

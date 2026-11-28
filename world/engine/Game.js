@@ -23,6 +23,7 @@ import { Explosions } from '../game/Explosions.js'
 import { Water, WaterSurface } from '../game/Water.js'
 import { Walker } from '../game/Walker.js'
 import { Jet } from '../game/Jet.js'
+import { Glider } from '../game/Glider.js'
 import { Course } from '../game/Course.js'
 import { Desk } from '../game/Desk.js'
 import { Room } from '../game/Room.js'
@@ -127,6 +128,7 @@ export class Game
         this.carVisual = new CarVisual()
         this.walker = new Walker()
         this.jet = new Jet()
+        this.glider = new Glider()                 // bail-out or crash: a hang glider you steer down
         this.course = new Course()                 // peaks, arches, a tunnel and a timed lap of gates
         this.desk = new Desk()                     // the computer by the airstrip: the résumé on its screen
         this.room = new Room()                     // the cabin by the start, the room under the island, the doors to the other sites

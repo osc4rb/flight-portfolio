@@ -50,7 +50,7 @@ export class IslandMap
         this.open = true
         this.el.hidden = false
         this.el.classList.remove('in'); void this.el.offsetWidth; this.el.classList.add('in')
-        if(g.mode !== 'fly') g.modes.lock(true)             // in the air the jet keeps its controls
+        if(g.mode !== 'fly' && g.mode !== 'glide') g.modes.lock(true)   // in the air the jet and the glider keep their controls
         g.sound && g.sound.pop(true)
         this.update()
         const x = this.el.querySelector('.h-x'); x && x.focus({ preventScroll: true })
@@ -88,7 +88,7 @@ export class IslandMap
     go(p)
     {
         const g = this.game
-        if(g.mode === 'fly' || !p.spot) return
+        if(g.mode === 'fly' || g.mode === 'glide' || !p.spot) return
         this.close()
         g.hud.wipe(() =>
         {

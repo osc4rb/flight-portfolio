@@ -79,6 +79,10 @@ kept read-only in `../vendor/folio-2025/` for reference.
   - Boost draws two glowing trails from the back corners (his `Trails.js`).
   - Ours: headlights with beams and a pool of light on the ground, and a roof light bar. All of them glow at night
     (Look's `nightUniform`).
+- `Glider.js`: a bail-out, or a crash in the air or on the ground, leaves you under a hang glider (mode `glide`). A/D turn,
+  W dives, S flares, about 5:1. On land you are on foot where you touch down and the truck is parked beside you; on
+  the sea or a rock you are put on the nearest beach. After a bail-out the empty jet noses over and crashes, then
+  is parked at the airstrip again with no wipe.
 - `JetLights.js`: his vehicle graphics fitted to the jet. Red and green wingtip lights, a double-flash strobe on the fin
   tips and a red beacon; a landing light with a beam and a pool on the ground while the gear is down (night only).
   White vapour trails from the wingtips when you pull hard above 45 m/s (his `Trails`). The main gear leaves tyre

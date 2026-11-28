@@ -22,6 +22,7 @@ export class Modes
             if(!action.active || this.locked) return
             if(this.game.mode === 'foot') this.game.hud.wipe(() => this.game.walker.moveTo(this.home()))
             if(this.game.mode === 'fly') this.game.jet.crash('Respawn')
+            if(this.game.mode === 'glide') { const p = this.game.glider.position; this.game.glider.land(this.game.stage.height(p.x, p.z) < - 0.3) }
         })
         this.game.ticker.events.on('tick', () => this.update(), 7.5)
     }
@@ -115,9 +116,17 @@ export class Modes
             const v = g.physicalVehicle
             spot = v.position.clone().add(new THREE.Vector3(0, 0, 2.6).applyQuaternion(v.quaternion)); spot.y = v.position.y + 1
         }
+        else if(bail && g.glider)
+        {
+            // out of the cockpit under a glider; the empty jet flies on until it comes down
+            const from = g.jet.position.clone(), yaw = g.jet.state.yaw
+            g.jet.exit()
+            g.glider.start(from, yaw, 'bail')
+            return
+        }
         else
         {
-            spot = bail ? g.jet.position.clone().add(new THREE.Vector3(0, - 3, 0)) : g.jet.door.add(new THREE.Vector3(0, 1.2, 0))
+            spot = bail ?g.jet.position.clone().add(new THREE.Vector3(0, - 3, 0)) : g.jet.door.add(new THREE.Vector3(0, 1.2, 0))
             g.jet.exit(); g.cameraOverride = null; this.far(false)
             if(bail) g.jet.crash('Ejected')
         }
