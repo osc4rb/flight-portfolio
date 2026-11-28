@@ -35,6 +35,8 @@ export class Places
         if(g.room) for(const d of g.room.doors)
             add(d.room ? 'room' : 'door-' + d.id, d.label, { color: d.color || '#f2c94c', lift: d.lift || 1.2, at: () => d.top.clone(),
                 find: true, spot: () => d.front.clone().add(v(Math.sin(d.face), 0, Math.cos(d.face)).multiplyScalar(1.5)).setY(d.front.y + 1.2) })
+        if(g.mailbox) add('mailbox', P.mailbox, { color: '#2f6fb0', lift: 2.4, at: () => g.mailbox.position.clone(),
+            spot: () => g.mailbox.position.clone().add(v(1.6, 1.2, 1.6)) })
         add('blimp', P.blimp, { color: '#b9a6ff', lift: - 4, side: 'left', at: () => g.sky.blimp.position.clone(), spot: null })
         for(const st of g.stations.list)
         {
@@ -102,7 +104,7 @@ export class Places
     busy()
     {
         const g = this.game
-        return g.reveal.active || g.desk.state !== 'idle' || (g.room && g.room.state !== 'off') || !g.hud.$('h-panel').hidden || (g.map && g.map.open)
+        return g.reveal.active || (g.mailbox && g.mailbox.isOpen) || g.desk.state !== 'idle' || (g.room && g.room.state !== 'off') || !g.hud.$('h-panel').hidden || (g.map && g.map.open)
     }
 
     update()

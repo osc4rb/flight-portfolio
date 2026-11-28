@@ -27,6 +27,7 @@ import { Glider } from '../game/Glider.js'
 import { Course } from '../game/Course.js'
 import { Desk } from '../game/Desk.js'
 import { Room } from '../game/Room.js'
+import { Mailbox } from '../game/Mailbox.js'
 import { Achievements } from '../game/Achievements.js'
 import { Letters } from '../game/Letters.js'
 import { Sky } from '../game/Sky.js'
@@ -133,6 +134,7 @@ export class Game
         this.course = new Course()                 // peaks, arches, a tunnel and a timed lap of gates
         this.desk = new Desk()                     // the computer by the airstrip: the résumé on its screen
         this.room = new Room()                     // the cabin by the start, the room under the island, the doors to the other sites
+        this.mailbox = new Mailbox()               // the letter: bump the mailbox or press E (after husam.world's)
         this.letters = new Letters()               // the name in big blocks you can knock over
         this.explosions = new Explosions()         // explosive crates and fireballs (his Explosions, Fireballs, ExplosiveCrates)
         this.sky = new Sky()                       // the blimp with the links, and the secret ring

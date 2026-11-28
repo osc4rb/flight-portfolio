@@ -212,7 +212,8 @@ window.FLIGHT_SITE = {
     // the map (world/game/Map.js): click a place to go there
     map: { title: "The island", hint: "Click a place to go there.", flying: "Land first, then pick a place to go.", close: "Close", you: "You" },
     // labels over the places and pins on the map (world/game/Places.js); the five people use their titles from `home`
-    places: { computer: "CV", jet: "Jet", truck: "Truck", circuit: "Race", blimp: "Links" },
+    places: { computer: "CV", jet: "Jet", truck: "Truck", circuit: "Race", blimp: "Links", mailbox: "Mail" },
+    mail: { prompt: "Write to me", title: "Write to me", copy: "Copy", copied: "Copied", close: "Close" },
     // the race (world/game/Course.js, Leaderboard.js). leaderboard: the Supabase project URL and its public anon key;
     // empty = times stay on each visitor's device
     race: { board: "Fastest laps", yourLap: "Your lap", name: "Your name", post: "Post", posted: "Posted", close: "Close" },

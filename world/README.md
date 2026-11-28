@@ -79,6 +79,10 @@ kept read-only in `../vendor/folio-2025/` for reference.
   - Boost draws two glowing trails from the back corners (his `Trails.js`).
   - Ours: headlights with beams and a pool of light on the ground, and a roof light bar. All of them glow at night
     (Look's `nightUniform`).
+- `Mailbox.js`: the letter, after husam.world's mailbox (measured: 2.5 s rate limit, 260 ms before it opens, a
+  `rgba(35,38,46,.45)` backdrop, a `min(470px,100%)` card with an ink outline, a 7 px offset shadow and a 10 px airmail
+  stripe, a .55 s spring in from `translateY(40px) rotate(-4deg)`, "Copied" for 1.6 s). Our own mailbox from
+  primitives at (−88, −95); the truck bumps it open, or E on foot. Words: `site.js` → `world.mail`.
 - `Minimap.js`: the round map in the top right (after Fortnite), drawn from Map.js's picture. Found places carry a diamond and
   their name; a hidden one is a faint dashed circle near it. Close to a hidden place (70 m) or the next lap gate (140 m)
   a ring pulses out with a ping, from 1.6 s down to 0.35 s. `Places.js` finds the cabin and the doorways within

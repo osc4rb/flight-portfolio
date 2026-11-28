@@ -15,6 +15,7 @@ export const ACHIEVEMENTS = [
     [ 'splash', 'Splashdown', 'Put the jet in the sea' ],
     [ 'computer', 'Screen in a screen', 'Read the résumé at the desk' ],
     [ 'room', 'House call', 'Go into the cabin' ],
+    [ 'mail', 'Mail call', 'Open the mailbox' ],
     [ 'explorer', 'Explorer', 'Find the cabin and all three doors' ],
     [ 'glide', 'Soft landing', 'Glide down after bailing out' ],
     [ 'people', 'Met everyone', 'Talk to all five people' ],
