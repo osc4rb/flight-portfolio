@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hangar · Oscar Basaula</title>
+<meta name="theme-color" content="#1f2124">
+<link rel="icon" href="../assets/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;600&display=swap" rel="stylesheet">
+<!-- The hangar's door in the world opens this page: a page of its own inside the site, after husam.world's stops
+     (each its own page and palette, with a way back to where you left). The words come from site.js. -->
+<style>
+:root{--bg:#1f2124;--panel:#2a2d31;--line:#3b3f45;--ink:#ebe7dc;--mu:#9a968c;--ac:#f2c230;--mono:"Geist Mono",ui-monospace,Consolas,monospace;--sys:-apple-system,BlinkMacSystemFont,"Segoe UI","Helvetica Neue",Arial,sans-serif}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 var(--sys);-webkit-font-smoothing:antialiased}
+.stripe{height:12px;background:repeating-linear-gradient(135deg,var(--ac) 0 16px,#141516 16px 32px)}
+.wrap{max-width:980px;margin:0 auto;padding:40px 24px 64px}
+header{display:flex;align-items:center;gap:16px;margin-bottom:32px}
+h1{margin:0;font:600 44px/1 var(--mono);letter-spacing:-.02em;text-transform:uppercase}
+.back{margin-left:auto;padding:9px 16px;border:2px solid var(--ac);border-radius:999px;color:var(--ac);font:600 14px var(--sys);text-decoration:none;transition:background .2s,color .2s}
+.back:hover,.back:focus-visible{background:var(--ac);color:#141516}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:16px}
+.card{position:relative;padding:22px 22px 20px;border:1px solid var(--line);border-left:4px solid var(--ac);border-radius:6px;background:var(--panel);opacity:0;transform:translateY(16px);animation:in .5s cubic-bezier(.4,1.6,.65,1) forwards}
+.card:nth-child(2){animation-delay:.06s}.card:nth-child(3){animation-delay:.12s}.card:nth-child(4){animation-delay:.18s}
+@keyframes in{to{opacity:1;transform:none}}
+.tag{margin:0 0 8px;color:var(--ac);font:600 12px var(--mono);letter-spacing:.06em;text-transform:uppercase}
+.card h2{margin:0 0 8px;font:700 21px/1.25 var(--sys)}
+.card p.text{margin:0;color:#cfcbc1}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:14px 0 0;padding:0;list-style:none}
+.chips li{padding:3px 9px;border:1px solid var(--line);border-radius:4px;color:var(--mu);font:12px var(--mono)}
+@media (max-width:560px){h1{font-size:32px}.wrap{padding-top:28px}}
+@media (prefers-reduced-motion:reduce){.card{animation:none;opacity:1;transform:none}}
+</style>
+</head>
+<body>
+<div class="stripe"></div>
+<div class="wrap">
+  <header><h1 id="title"></h1><a class="back" id="back" href="index.html#from-hangar"></a></header>
+  <main class="grid" id="grid"></main>
+</div>
+<script src="../site.js"></script>
+<script>
+(() => {
+  const S = window.FLIGHT_SITE || {}, H = (S.world && S.world.hangar) || {}, all = (S.home && S.home.projects) || []
+  const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]))
+  document.getElementById('title').textContent = H.title || ''
+  document.getElementById('back').textContent = H.back || ''
+  const list = (H.projects || []).map(t => all.find(p => p.title === t)).filter(Boolean)
+  document.getElementById('grid').innerHTML = list.map(p => `<article class="card">
+      <p class="tag">${esc(p.tag)}</p><h2>${p.href ? `<a href="${esc(p.href)}" style="color:inherit">${esc(p.title)}</a>` : esc(p.title)}</h2>
+      <p class="text">${esc(p.text)}</p>${(p.chips || []).length ? `<ul class="chips">${p.chips.map(c => `<li>${esc(c)}</li>`).join('')}</ul>` : ''}</article>`).join('')
+  addEventListener('keydown', e => { if(e.key === 'Escape') location.href = document.getElementById('back').href })
+})()
+</script>
+</body>
+</html>

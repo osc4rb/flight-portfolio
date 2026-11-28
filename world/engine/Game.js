@@ -154,6 +154,7 @@ export class Game
         this.physicalVehicle.steeringAmplitude = 0.62   // his 0.5: the truck turns a little sharper
 
         this.modes.start()
+        this.room.arrive()                         // back from a door's page: start at that door
         this.reveal.mask()                         // the few materials that are not MeshDefaultMaterial
         // compile every shader now, behind the loader, so nothing hitches the first time it comes into view
         progress(0.95, 'shaders')

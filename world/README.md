@@ -81,6 +81,11 @@ kept read-only in `../vendor/folio-2025/` for reference.
   - Boost draws two glowing trails from the back corners (his `Trails.js`).
   - Ours: headlights with beams and a pool of light on the ground, and a roof light bar. All of them glow at night
     (Look's `nightUniform`).
+- `hangar.html`: the hangar's side door (Room.js `DOORS`, the fifth, at (−18, −89.4) on its back wall) opens a page of
+  its own, after husam.world's stops: its own palette (hangar grey, safety yellow, a hazard stripe), the flight work
+  picked by title from `home.projects` (`site.js` → `world.hangar`), and a link back to `index.html#from-hangar`.
+  Every door now leaves `#from-<id>` on the world's address before it navigates, so Back (or that link) skips the
+  opening and puts you at that door with "Back on the island" (`Room.arrive`, as husam.world's `#from-` return).
 - `Mailbox.js`: the letter, after husam.world's mailbox (measured: 2.5 s rate limit, 260 ms before it opens, a
   `rgba(35,38,46,.45)` backdrop, a `min(470px,100%)` card with an ink outline, a 7 px offset shadow and a 10 px airmail
   stripe, a .55 s spring in from `translateY(40px) rotate(-4deg)`, "Copied" for 1.6 s). Our own mailbox from

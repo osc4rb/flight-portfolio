@@ -228,7 +228,11 @@ window.FLIGHT_SITE = {
       { id: "bullets", tab: "Door 2", name: "Falcon Bullets",   label: "Bullets", go: "Go in", color: "#5fb3cf", href: "https://osc4rb.github.io/squad-tools/bullets/" },
       { id: "matcher", tab: "Door 3", name: "Coaching matcher", label: "Matcher", go: "Go in", color: "#9fe0b7", href: "https://github.com/osc4rb/martinson-coaching-match" },
       { id: "cs37",    tab: "Door 4", name: "CS-37 site",       label: "CS-37",   go: "Go in", color: "#ef8a6f", href: "https://osc4rb.github.io/squad-tools/" },
+      { id: "hangar",  tab: "Door 5", name: "Hangar",           label: "Hangar",  go: "Go in", color: "#f2c230", href: "hangar.html" },
     ],
+    // the hangar's own page (world/hangar.html): the flight work, picked by title from home.projects
+    hangar: { title: "Hangar", back: "← Back to the island", projects: [ "ADS-B position verification", "Satellite navigation without GPS", "Drone flight-data logger", "Spacesuit AR display" ] },
+    returned: "Back on the island",
     // the room: hover labels and panel titles for the computer, board, shelf and phone; the shelf holds the items of
     // `home` whose lead is in `papers`
     room: {

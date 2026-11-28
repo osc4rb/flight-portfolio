@@ -15,7 +15,8 @@ import { HIDDEN_SPOTS } from './Stage.js'
 const ROOM = new THREE.Vector3(- 91.5, - 400, - 107)                // far under the start disc: never in view from the island
 const FOV = 30
 const CABIN = { x: HIDDEN_SPOTS.cabin[0], z: HIDDEN_SPOTS.cabin[1], yaw: Math.PI / 4, scale: 1.4 }   // out in the hills, found by exploring
-const DOORS = HIDDEN_SPOTS.doors.map(([ x, z ]) => ({ x, z }))     // the doorways, in site.js order after the room
+const DOORS = [ ...HIDDEN_SPOTS.doors.map(([ x, z ]) => ({ x, z })),  // the doorways, in site.js order after the room
+    { x: - 18, z: - 89.4, yaw: 0 } ]                                   // the hangar's side door, on its back wall
 const DOORWAY = { scale: 1.05, yaw: Math.PI / 4 }
 const NEAR = 3.2                                                    // m from a door's front: the sign shows
 // what you can use in the room: its nodes, the way the camera looks at it, and how much of it fills the view (m)
@@ -91,7 +92,7 @@ export class Room
     {
         list.slice(0, DOORS.length).forEach((d, i) =>
         {
-            const p = DOORS[i], obj = this.put('doorway', p.x, p.z, DOORWAY.yaw, DOORWAY.scale); if(!obj) return
+            const p = DOORS[i], obj = this.put('doorway', p.x, p.z, p.yaw ?? DOORWAY.yaw, DOORWAY.scale); if(!obj) return
             obj.traverse(c => { if(c.isMesh && c.name === 'Panel') { c.material = c.material.clone(); c.material.color.set(d.color || '#3d5a73') } })
             this.collide(obj, [ 0.2, 2.9, 0.24 ], [ - 0.68, 1.45, 0 ])
             this.collide(obj, [ 0.2, 2.9, 0.24 ], [ 0.68, 1.45, 0 ])
@@ -260,10 +261,23 @@ export class Room
         if(this.busy || !d) return
         const g = this.game
         if(this.state !== 'off') return
-        if(d.href) { this.sign(null); this.wipe(d, () => { location.href = d.href }); return }
+        // the way back (after husam.world): this page's address now ends in #from-<door>, so Back lands you at the door
+        if(d.href) { this.sign(null); this.wipe(d, () => { history.replaceState(null, '', '#from-' + d.id); location.href = d.href }); return }
         this.sign(null)
         g.modes.lock(true); g.walker.setActive(false); g.hud.prompt(null)
         this.wipe(d, () => this.enter(), true)
+    }
+
+    // arriving from a door's page (#from-<id>): no opening, you stand at that door, and a toast says so
+    arrive()
+    {
+        const m = location.hash.match(/^#from-([\w-]+)/), d = m && this.doors.find(x => x.id === m[1]); if(!d) return
+        const g = this.game, spot = d.front.clone().add(new THREE.Vector3(Math.sin(d.face), 0, Math.cos(d.face)).multiplyScalar(1.6)).setY(d.front.y + 1.2)
+        g.walker.moveTo(spot, d.face)
+        const f = g.view.focusPoint; f.trackedPosition.copy(spot); f.smoothedPosition.copy(spot); f.position && f.position.copy(spot)
+        const p = g.places && g.places.list.find(q => q.find && q.at && q.name === d.label); if(p && !p.found) g.places.discover(p)
+        setTimeout(() => g.hud.toast(((g.site.world || {}).returned) || ''), 300)
+        history.replaceState(null, '', location.pathname + location.search)
     }
 
     // ---------------------------------------------------------------- in and out

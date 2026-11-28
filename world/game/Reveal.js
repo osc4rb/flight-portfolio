@@ -27,7 +27,7 @@ export class Reveal
         this.step = -1
         this.active = true                          // true until the world is fully revealed
         this.waiting = []
-        this.skip = /[?&]skip=1/.test(location.search) || /skip/i.test(location.hash)
+        this.skip = /[?&]skip=1/.test(location.search) || /skip|^#from-/i.test(location.hash)   // #from-<door>: back from a door's page
         this.position = this.game.respawns.getDefault().position.clone()
         this.position2Uniform = uniform(vec2(this.position.x, this.position.z))
         this.distance = uniform(0)
