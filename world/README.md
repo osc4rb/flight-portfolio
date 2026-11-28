@@ -161,7 +161,7 @@ kept read-only in `../vendor/folio-2025/` for reference.
   Viewports narrower than 700 px open the page instead. The technique follows Henry Heffernan's
   portfolio-website (github.com/henryjeff/portfolio-website, MIT, © Henry Heffernan): a CSS3D iframe on a
   monitor plane and a camera move into it. No code or assets were copied.
-- `Room.js`: the cabin by the start disc, the room under the island, and the doors to the other sites.
+- `Room.js`: the cabin out in the hills (found by exploring), the room under the island, and the doors to the other sites.
   - Walk up to a door and a sign slides up from the bottom: a tab ("Door 1"), the name and a "Go in" button, E or
     Enter. Its structure follows husam.world's exit sign, measured from his CSS (a tab over a framed panel, a
     key-capped button, a spring in from below); the colours and type are ours. A circle in the door's colour grows
@@ -251,9 +251,12 @@ multiplies it in.
   scale 1, so flight and the collider are unchanged; `planes.js` is the fallback.
 - `garage.glb` (1.3 MB): a ribbed Quonset hangar with half-open doors, hazard stripes, an office annex, crates and a
   workbench. It sits at 1:1, its doors at the runway's edge.
-- `room.glb` (1.5 MB): the room: a plank floor, two walls, a window, a desk with the computer (`Computer` and a
-  `Screen` plane like the desk's), a corkboard (`Board` and `BoardFace`, which Room.js draws the projects on), a
-  bookshelf (`Shelf`), a side table with a phone (`Phone`), a rug, a beanbag, a floor lamp, a chest and a plant
+- `room.glb` (2.1 MB, rebuilt 28 Nov from the measured room portfolios, notes `room-art.md` in the side-session folder):
+  a 4.8 x 4.2 m cutaway on a slab with a cut edge, two plum walls, the light baked in Cycles into the vertex colours
+  (a warm window sun, a cool fill, and glow pools from the monitor #0082ff, the desk lamp #ff6700 and a neon #ff115e).
+  Room.js draws it unlit (`MeshBasicMaterial`, vertex colours, no tone mapping, no shadows). Nodes: `Room` (all static
+  props), `Computer`, `Screen` (0.8 x 0.45 m, so `Desk.use` scale 0.5), `Board`, `BoardFace`, `Shelf` (40+ things,
+  a model jet among them), `Phone`, `Chair` (sways), `Lamp`, `Steam` (an empty; Room.js puffs steam there).
 - `cabin.glb` (1.0 MB): a log cabin with a gable roof, a chimney, lit windows and a `Door`
 - `doorway.glb` (0.1 MB): a free-standing door frame on a step, the door ajar; Room.js tints `Panel` per site
 - `arch.glb` (1.3 MB): a unit sea arch (radius 1, tube 0.2, legs thickened like `Course.js`'s collision shape),

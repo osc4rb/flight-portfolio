@@ -105,7 +105,13 @@ export class Room
         const g = this.game, src = g.stage.models.room; if(!src) return
         const room = this.room = src.scene.clone(true)
         room.position.copy(ROOM)
-        room.traverse(c => { if(c.isMesh) { c.castShadow = c.receiveShadow = true; c.userData.noBounce = true } })   // no grass light from below
+        // the light is baked into the vertex colours (bake_models.py): unlit, no shadows, no fog, no tone mapping
+        room.traverse(c =>
+        {
+            if(!c.isMesh) return
+            c.material = new THREE.MeshBasicMaterial({ vertexColors: !!c.geometry.attributes.color, toneMapped: false }); c.material.fog = false
+            c.userData.keepMaterial = true; c.castShadow = c.receiveShadow = false
+        })
         g.scene.add(room)
         room.updateMatrixWorld(true)
         // the computer's screen shows the same drawing of the résumé as the desk's; the live page is laid on it on use
@@ -116,7 +122,9 @@ export class Room
             this.screen.material = new THREE.MeshBasicMaterial({ map: pic }); this.screen.userData.keepMaterial = true; this.screen.castShadow = false
         }
         const face = room.getObjectByName('BoardFace')
-        if(face) { const t = this.board(); t.flipY = false; face.material = new THREE.MeshLambertMaterial({ map: t }); face.castShadow = false }
+        if(face) { const t = this.board(); t.flipY = false; face.material = new THREE.MeshBasicMaterial({ map: t, vertexColors: !!face.geometry.attributes.color, toneMapped: false }); face.material.fog = false; face.castShadow = false }
+        this.chair = room.getObjectByName('Chair'); this.chairYaw = this.chair ? this.chair.rotation.y : 0
+        this.setSteam(room.getObjectByName('Steam'))
 
         const L = this.words.labels || {}
         for(const T of THINGS)
@@ -127,6 +135,21 @@ export class Room
             const tag = L[T.id] ? label(L[T.id], '#f2c94c') : null
             if(tag) { tag.scale.multiplyScalar(0.3); tag.position.set((box.min.x + box.max.x) / 2, box.max.y + 0.28, (box.min.z + box.max.z) / 2); tag.visible = false; g.scene.add(tag) }
             this.things.push({ ...T, meshes, box, tag, glow: [], amount: 0 })
+        }
+    }
+
+    // steam over the mug: a few soft puffs rising and fading in turn
+    setSteam(at)
+    {
+        if(!at) return
+        const mat = () => { const m = new THREE.SpriteMaterial({ color: '#ffffff', transparent: true, opacity: 0, depthWrite: false }); m.fog = false; return m }
+        this.steam = []
+        for(let i = 0; i < 5; i++)
+        {
+            const s = new THREE.Sprite(mat()); s.userData.keepMaterial = true; s.userData.noReveal = true
+            s.position.copy(at.getWorldPosition(new THREE.Vector3()))
+            this.game.scene.add(s)
+            this.steam.push({ s, base: s.position.clone(), phase: i / 5 })
         }
     }
 
@@ -168,7 +191,7 @@ export class Room
     start()
     {
         for(const t of this.things)
-            for(const m of t.meshes) m.traverse(c => { if(c.isMesh && c.material && c.material.emissive) { c.material = c.material.clone(); t.glow.push(c.material) } })
+            for(const m of t.meshes) m.traverse(c => { if(c.isMesh && c.material && (c.material.emissive || c.material.isMeshBasicMaterial)) { c.material = c.material.clone(); t.glow.push(c.material) } })
     }
 
     // ---------------------------------------------------------------- the sign, the wipe, the back button
@@ -252,7 +275,7 @@ export class Room
         this.drag.x = this.drag.tx = 0; this.drag.y = this.drag.ty = 0; this.drag.zoom = this.drag.tz = 1
         g.cameraOverride = cam => this.camera(cam)
         this.sunAt = ROOM
-        this.bg = [ new THREE.Color('#2b2522'), new THREE.Color('#100f0f') ]
+        this.bg = [ new THREE.Color('#161314'), new THREE.Color('#0c0b0b') ]   // the dark void the measured rooms float on
         this.hud.classList.add('in-room')
         this.back.hidden = false
         g.achievements && g.achievements.unlock('room')
@@ -348,7 +371,7 @@ export class Room
         {
             if(!this.screen) return
             this.state = 'desk'; this.back.hidden = true
-            g.desk.use({ screen: this.screen, scale: 1, backLabel: this.words.screenBack, back: () => { this.state = 'orbit'; g.cameraOverride = cam => this.camera(cam); this.back.hidden = false } })
+            g.desk.use({ screen: this.screen, scale: 0.5, backLabel: this.words.screenBack, back: () => { this.state = 'orbit'; g.cameraOverride = cam => this.camera(cam); this.back.hidden = false } })
             return
         }
         this.current = t
@@ -390,7 +413,7 @@ export class Room
     orbitPose()
     {
         const g = this.game, asp = g.viewport.width / g.viewport.height, tan = Math.tan(FOV * Math.PI / 360), D = this.drag
-        const dist = Math.max(9, 4.7 / (tan * asp)) * D.zoom
+        const dist = Math.max(7.5, 3.9 / (tan * asp)) * D.zoom              // the room is 4.8 x 4.2 m
         const th = Math.PI / 4 + D.x, ph = 0.46 + D.y
         const pos = this.center.clone().add(new THREE.Vector3(Math.sin(th) * Math.cos(ph), Math.sin(ph), Math.cos(th) * Math.cos(ph)).multiplyScalar(dist))
         return { pos, quat: new THREE.Quaternion().setFromRotationMatrix(new THREE.Matrix4().lookAt(pos, this.center, new THREE.Vector3(0, 1, 0))) }
@@ -430,6 +453,14 @@ export class Room
     {
         const g = this.game, dt = g.ticker.delta, time = g.ticker.elapsed
         if(this.state === 'off') return
+        // his small touches: the chair sways, the steam rises
+        if(this.chair) this.chair.rotation.y = this.chairYaw + Math.sin(time * 0.5) * 0.5
+        if(this.steam) for(const p of this.steam)
+        {
+            const k = (time * 0.35 + p.phase) % 1
+            p.s.position.set(p.base.x + Math.sin(time * 1.7 + p.phase * 9) * 0.03 * k, p.base.y + k * 0.32, p.base.z)
+            p.s.scale.setScalar(0.05 + k * 0.09); p.s.material.opacity = Math.sin(k * Math.PI) * 0.32
+        }
         const D = this.drag, k = Math.min(1, dt * 6)
         D.x += (D.tx - D.x) * k; D.y += (D.ty - D.y) * k; D.zoom += (D.tz - D.zoom) * k
         if(this.state === 'dive' || this.state === 'back')
@@ -448,7 +479,7 @@ export class Room
             t.amount += (want - t.amount) * Math.min(1, dt * 10)
             if(Math.abs(t.amount - want) < 0.005) t.amount = want
             const pulse = t.amount * (0.3 + Math.sin(time * 6) * 0.08)
-            for(const m of t.glow) { m.emissive.setRGB(1, 0.85, 0.45); m.emissiveIntensity = pulse }
+            for(const m of t.glow) { if(m.emissive) { m.emissive.setRGB(1, 0.85, 0.45); m.emissiveIntensity = pulse } else m.color.setRGB(1 + pulse * 1.4, 1 + pulse * 1.1, 1 + pulse * 0.6) }   // unlit: brighten the baked colours
             if(t.tag) t.tag.position.y = t.box.max.y + 0.28 + Math.sin(time * 2) * 0.03
         }
     }
