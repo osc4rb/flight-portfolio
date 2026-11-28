@@ -73,8 +73,17 @@ export class IslandMap
         this.pins.innerHTML = ''
         for(const p of g.places.list)
         {
+            if(p.find && !p.found)
+            {
+                // not found yet: only a faint circle somewhere around it (the same one as on the minimap)
+                const at = p.at(), j = g.minimap ? g.minimap.jitter(p) : { x: 0, z: 0 }, m = this.toMap(at.x + j.x, at.z + j.z)
+                const o = document.createElement('i'); o.className = 'm-area'
+                o.style.left = (m.u * 100).toFixed(2) + '%'; o.style.top = (m.v * 100).toFixed(2) + '%'; o.style.setProperty('--r', (28 / (2 * E) * 100).toFixed(2) + '%')
+                this.pins.appendChild(o)
+                continue
+            }
             const at = p.at(), m = this.toMap(at.x, at.z)
-            const b = document.createElement('button'); b.type = 'button'; b.className = 'm-pin' + ((p.side === 'left' || m.u > 0.68) && m.u > 0.3 ? ' left' : '')   // near the right edge, the name goes left
+            const b = document.createElement('button'); b.type = 'button'; b.className = 'm-pin' + (p.find ? ' found' : '') + ((p.side === 'left' || m.u > 0.68) && m.u > 0.3 ? ' left' : '')   // near the right edge, the name goes left
             b.style.left = (m.u * 100).toFixed(2) + '%'; b.style.top = (m.v * 100).toFixed(2) + '%'; b.style.setProperty('--c', p.color)
             b.style.zIndex = Math.round(m.v * 1000)
             b.innerHTML = `<i></i><span>${esc(p.name)}</span>`
@@ -90,7 +99,7 @@ export class IslandMap
         const g = this.game
         if(g.mode === 'fly' || g.mode === 'glide' || !p.spot) return
         this.close()
-        g.hud.wipe(() =>
+        this.fade(() =>
         {
             if(g.mode === 'drive') g.modes.leave('drive')
             const spot = p.spot()
@@ -101,6 +110,16 @@ export class IslandMap
         })
     }
 
+    // travel, as husam.world measured: the sky's colour fades in over .35 s, you move at 380 ms, then it fades out
+    fade(callback)
+    {
+        let f = document.querySelector('.h-fade')
+        if(!f) { f = document.createElement('div'); f.className = 'h-fade'; document.getElementById('hud').appendChild(f) }
+        const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches
+        f.classList.add('on')
+        setTimeout(() => { callback(); setTimeout(() => f.classList.remove('on'), 20) }, reduce ? 60 : 380)
+    }
+
     update()
     {
         if(!this.open) return
@@ -108,7 +127,7 @@ export class IslandMap
         this.you.style.left = (m.u * 100).toFixed(2) + '%'
         this.you.style.top = (m.v * 100).toFixed(2) + '%'
         // which way you face: every mode turns +x by its yaw, so forward is (cos, −sin); then into map terms
-        const yaw = g.mode === 'fly' ? g.jet.state.yaw : g.mode === 'drive' ? g.physicalVehicle.yRotation : g.walker.yaw
+        const yaw = g.mode === 'fly' ? g.jet.state.yaw : g.mode === 'glide' ? g.glider.s.yaw : g.mode === 'drive' ? g.physicalVehicle.yRotation : g.walker.yaw
         const fx = Math.cos(yaw), fz = - Math.sin(yaw)
         this.you.style.setProperty('--a', Math.atan2(fx + fz, fx - fz) + 'rad')
     }

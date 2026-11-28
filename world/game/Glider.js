@@ -151,6 +151,7 @@ export class Glider
         if(!wet)
         {
             g.sound.land(0.8); g.juice.ring(new THREE.Vector3(p.x, g.stage.height(p.x, p.z), p.z), 14, '#e9dfc6', 4)
+            g.achievements && g.achievements.unlock && g.achievements.unlock('glide')
             finish(p.x, p.z, s.yaw)
             return
         }

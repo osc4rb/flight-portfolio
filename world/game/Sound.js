@@ -60,6 +60,7 @@ export class Sound
 
     tone({ type = 'sine', f0 = 440, f1 = f0, a = 0.005, d = 0.15, peak = 0.3, delay = 0, pan = 0, dest = this.out })
     {
+        if(!this.ctx) return                    // before the first click there is no audio yet
         const c = this.ctx, t = c.currentTime + delay, o = c.createOscillator(), g = c.createGain()
         o.type = type; o.frequency.setValueAtTime(f0, t); if(f1 !== f0) o.frequency.exponentialRampToValueAtTime(Math.max(20, f1), t + a + d)
         this.env(g, t, a, peak, d)

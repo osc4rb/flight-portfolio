@@ -1,0 +1,14 @@
+/* explore.css — the minimap (Minimap.js), hidden places on the M map, and the travel fade (Map.js) */
+.h-mini{position:absolute;top:62px;right:14px;width:156px;height:156px;padding:0;border:3px solid rgba(255,255,255,.92);border-radius:50%;overflow:hidden;background:#2f6f98;box-shadow:0 6px 18px -6px rgba(0,0,0,.55);cursor:pointer;transition:border-color .3s,transform .3s cubic-bezier(.4,1.6,.65,1)}
+.h-mini canvas{display:block;width:100%;height:100%}
+.h-mini:hover,.h-mini:focus-visible{transform:scale(1.04)}
+.h-mini.hot{border-color:#f2c94c}
+.mm-you{position:absolute;left:50%;top:50%;width:0;height:0;margin:-6px 0 0 -4px;border-left:13px solid #fff;border-top:6px solid transparent;border-bottom:6px solid transparent;transform-origin:4px 6px;transform:rotate(var(--a,0rad));filter:drop-shadow(0 1px 2px rgba(0,0,0,.7));pointer-events:none}
+@media (max-width:600px){.h-mini{width:108px;height:108px;top:58px;right:10px}}
+
+.m-area{position:absolute;width:calc(var(--r) * 2);aspect-ratio:1;transform:translate(-50%,-50%);border:1.5px dashed rgba(255,255,255,.7);border-radius:50%;background:rgba(255,255,255,.1);pointer-events:none}
+.m-pin.found i{box-shadow:0 0 0 2px rgba(255,255,255,.85),0 0 0 5px #9fe0b7}
+.m-pin.found span{text-transform:uppercase;letter-spacing:.04em}
+
+.h-fade{position:absolute;inset:0;z-index:20;background:linear-gradient(#bfe6fb,#8fb5f5);opacity:0;pointer-events:none;transition:opacity .35s}
+.h-fade.on{opacity:1}

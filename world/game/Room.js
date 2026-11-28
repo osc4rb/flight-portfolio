@@ -10,11 +10,12 @@
 import * as THREE from 'three/webgpu'
 import { Game } from '../engine/Game.js'
 import { label } from './Stations.js'
+import { HIDDEN_SPOTS } from './Stage.js'
 
 const ROOM = new THREE.Vector3(- 91.5, - 400, - 107)                // far under the start disc: never in view from the island
 const FOV = 30
-const CABIN = { x: - 100, z: - 98.5, yaw: Math.PI / 4, scale: 1.4 }
-const DOORS = [ { x: - 90, z: - 94 }, { x: - 85, z: - 95.5 }, { x: - 80, z: - 97 } ]   // the doorways, in site.js order after the room
+const CABIN = { x: HIDDEN_SPOTS.cabin[0], z: HIDDEN_SPOTS.cabin[1], yaw: Math.PI / 4, scale: 1.4 }   // out in the hills, found by exploring
+const DOORS = HIDDEN_SPOTS.doors.map(([ x, z ]) => ({ x, z }))     // the doorways, in site.js order after the room
 const DOORWAY = { scale: 1.05, yaw: Math.PI / 4 }
 const NEAR = 3.2                                                    // m from a door's front: the sign shows
 // what you can use in the room: its nodes, the way the camera looks at it, and how much of it fills the view (m)

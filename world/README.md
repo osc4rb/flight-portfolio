@@ -79,6 +79,11 @@ kept read-only in `../vendor/folio-2025/` for reference.
   - Boost draws two glowing trails from the back corners (his `Trails.js`).
   - Ours: headlights with beams and a pool of light on the ground, and a roof light bar. All of them glow at night
     (Look's `nightUniform`).
+- `Minimap.js`: the round map in the top right (after Fortnite), drawn from Map.js's picture. Found places carry a diamond and
+  their name; a hidden one is a faint dashed circle near it. Close to a hidden place (70 m) or the next lap gate (140 m)
+  a ring pulses out with a ping, from 1.6 s down to 0.35 s. `Places.js` finds the cabin and the doorways within
+  16–34 m (by mode) and keeps them in localStorage `oscar-world-found`. The M map shows the same circles and travels
+  only to found places, with husam.world's fade (sky colour, .35 s in, move at 380 ms, .35 s out). CSS: `explore.css`.
 - `Glider.js`: a bail-out, or a crash in the air or on the ground, leaves you under a hang glider (mode `glide`). A/D turn,
   W dives, S flares, about 5:1. On land you are on foot where you touch down and the truck is parked beside you; on
   the sea or a rock you are put on the nearest beach. After a bail-out the empty jet noses over and crashes, then

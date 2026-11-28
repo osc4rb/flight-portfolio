@@ -73,12 +73,24 @@ const FLAT = [
 ]
 export const STATION_SPOTS = [ [ 0, 92 ], [ -96, 34 ], [ 96, 30 ], [ -78, -58 ], [ 82, -60 ] ]
 STATION_SPOTS.forEach(([ x, z ]) => FLAT.push({ x, z, w: 13, d: 13 }))
+// the places you find by exploring, out in the hills (Room.js): the cabin, then the three doorways in site.js order
+export const HIDDEN_SPOTS = { cabin: [ - 100, 100 ], doors: [ [ - 132, - 20 ], [ 35, 128 ], [ 128, 40 ] ] }
+
+// the hills before any levelling
+function rise(x, z)
+{
+    const r = Math.hypot(x, z)
+    return (vnoise(x * 0.025, z * 0.025) - 0.5) * 9 + (vnoise(x * 0.07 + 9, z * 0.07) - 0.5) * 2.5 + 2.2
+        + smooth(90, 140, r) * smooth(0, 1, vnoise(x * 0.012 + 40, z * 0.012)) * 9     // hills near the edge
+}
+// each hidden place stands on a small level pad at the hill's own height there
+export const PADS = [ HIDDEN_SPOTS.cabin, ...HIDDEN_SPOTS.doors ].map(([ x, z ]) => ({ x, z, w: 7, d: 7, y: rise(x, z) }))
 
 export function height(x, z)
 {
     const r = Math.hypot(x, z)
-    let h = (vnoise(x * 0.025, z * 0.025) - 0.5) * 9 + (vnoise(x * 0.07 + 9, z * 0.07) - 0.5) * 2.5 + 2.2
-    h += smooth(90, 140, r) * smooth(0, 1, vnoise(x * 0.012 + 40, z * 0.012)) * 9     // hills near the edge
+    let h = rise(x, z)
+    for(const f of PADS) { const k = 1 - smooth(0.75, 1.25, Math.max(Math.abs(x - f.x) / f.w, Math.abs(z - f.z) / f.d)); if(k > 0) h += (f.y - h) * k }
     let flat = 0
     for(const f of FLAT) flat = Math.max(flat, 1 - smooth(0.75, 1.25, Math.max(Math.abs(x - f.x) / f.w, Math.abs(z - f.z) / f.d)))
     // the airfield: flat from the runway north past the start disc, the letters and the hangar (fading 26–40 m out),
@@ -331,7 +343,7 @@ export class Stage
         for(let n = 0; n < 900 && spots.length < 260; n++)
         {
             const a = R() * Math.PI * 2, r = 30 + Math.sqrt(R()) * (R_LAND - 34), x = Math.cos(a) * r, z = Math.sin(a) * r
-            if(FLAT.some(f => Math.abs(x - f.x) < f.w + 4 && Math.abs(z - f.z) < f.d + 4)) continue
+            if([ ...FLAT, ...PADS ].some(f => Math.abs(x - f.x) < f.w + 4 && Math.abs(z - f.z) < f.d + 4)) continue
             if(this.nearRoad(x, z, 7) || height(x, z) < 1.2) continue
             spots.push([ x, z, 0.8 + R() * 0.7 ])
         }

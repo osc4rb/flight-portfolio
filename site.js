@@ -246,7 +246,7 @@ window.FLIGHT_SITE = {
       { goal: "lap",      at: "circuit",  text: "Nice. See the yellow ring over the runway? Fly through it to start a lap, then follow the gates round the mountains." },
       { goal: "land",                    text: "Good flying! Now bring it down on the runway: throttle back with B and keep the wings level." },
       { goal: "computer", at: "computer", text: "The computer where you started has my résumé on its screen. Walk up to it and press E." },
-      { goal: "room",     at: "room",     text: "The cabin beside the computer is my room. Walk up to the door and go in." },
+      { goal: "room",     at: "room",     text: "My room is a cabin somewhere up in the hills. The map in the corner pulses when you get close. Find it and go in." },
       { goal: "people",   at: "people",  text: "Five people in town each hold one part of what I do. Go and say hi to all of them." },
       { goal: "blimp",    at: "blimp",    text: "The blimp circling the island carries my links. Fly close and they pop up." },
       { goal: "secret",                  text: "Last one, if you like a challenge: a gold ring is hidden high above the island." },

@@ -42,6 +42,7 @@ import { Ambience } from '../game/Ambience.js'
 import { Reveal } from '../game/Reveal.js'
 import { Places } from '../game/Places.js'
 import { IslandMap } from '../game/Map.js'
+import { Minimap } from '../game/Minimap.js'
 import { Perf } from '../game/Perf.js'
 
 const noop = () => {}
@@ -146,6 +147,7 @@ export class Game
         this.quests = new Quests()                 // messages from Oscar: one thing to do at a time
         this.places = new Places()                 // labels over the places, and an arrow toward the current quest
         this.map = new IslandMap()                 // M: the island from above; click a place to go there
+        this.minimap = new Minimap()               // the round map in the corner: found places, and the closeness cue
         this.perf = new Perf()                     // fewer pixels if the frame rate is low
         this.physicalVehicle.steeringAmplitude = 0.62   // his 0.5: the truck turns a little sharper
 
