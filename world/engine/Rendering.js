@@ -77,6 +77,7 @@ export class Rendering
 
         const scenePass = pass(this.game.scene, this.game.view.camera)
         const scenePassColor = scenePass.getTextureNode('output')
+        this.scenePassColor = scenePassColor // [world patch] Perf.js drops the blur on slow GPUs
 
         this.bloomPass = bloom(scenePassColor)
         this.bloomPass._nMips = this.game.quality.level === 0 ? 5 : 2

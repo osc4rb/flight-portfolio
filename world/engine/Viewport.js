@@ -5,6 +5,7 @@ export class Viewport
     constructor(domElement)
     {
         this.domElement = domElement
+        this.pixelRatioMax = 1.5 // [world patch] his max is 2; Perf.js lowers it further on slow GPUs
 
         this.events = new Events()
         
@@ -21,7 +22,6 @@ export class Viewport
         this.ratio = this.width / this.height
 
         this.pixelRatioPure = window.devicePixelRatio
-        this.pixelRatioMax = 1.5 // [world patch] his max is 2; Perf.js lowers it further on slow GPUs
         this.pixelRatio = Math.min(this.pixelRatioPure, this.pixelRatioMax)
     }
 

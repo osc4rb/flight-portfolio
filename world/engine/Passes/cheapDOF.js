@@ -19,7 +19,7 @@ class CheapDOFNode extends Node
 		this.start = uniform(0.2)
 		this.end = uniform(0.5)
 
-		this.repeats = uniform(25)
+		this.repeats = uniform(10) // [world patch] his 25 taps per pixel cost too much on laptop GPUs
 		this.amount = uniform(0.003)
 	}
 

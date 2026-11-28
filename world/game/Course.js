@@ -7,6 +7,7 @@ import * as THREE from 'three/webgpu'
 import { Game } from '../engine/Game.js'
 import { rng } from './Stage.js'
 import { Leaderboard } from './Leaderboard.js'
+import { batch } from './Batch.js'
 
 const BEST = 'world-course-best', TOP = 'world-course-top'
 export const PODIUM = { x: 80, z: - 99.5 }                       // clear of the start gantry's posts
@@ -116,6 +117,7 @@ export class Course
         this.setPeaks()
         this.setMarker()
         this.setStart()
+        batch(this.group, [ this.rock, this.dark ])           // the rock and the start's dark posts: one draw call each
         this.game.ticker.events.on('tick', () => this.update(), 9)
     }
 
@@ -289,7 +291,7 @@ export class Course
     setStart()
     {
         const g = this.gates[0], side = new THREE.Vector3(g.n.z, 0, - g.n.x), H = this.game.stage.height, ob = this.game.objects
-        const dark = new THREE.MeshLambertMaterial({ color: '#2d2c2b' }), top = g.y + g.r + 2.5, half = g.r + 3
+        const dark = this.dark = new THREE.MeshLambertMaterial({ color: '#2d2c2b' }), top = g.y + g.r + 2.5, half = g.r + 3
         const ends = [ - 1, 1 ].map(s => new THREE.Vector3(g.x + side.x * s * half, top, g.z + side.z * s * half))
         for(const e of ends)
         {

@@ -16,9 +16,9 @@ they import at jsDelivr:
 - gsap, camera-controls, seedrandom, normalize-wheel
 - Rapier 0.19.3 compat
 
-Copied as-is: Events, Ticker, Time, Viewport, Objects, View, Rendering, Player, Physics/Physics,
+Copied as-is: Events, Ticker, Time, Objects, View, Player, Physics/Physics,
 Physics/PhysicsVehicle, Inputs/* (keyboard, gamepad, pointer, wheel, touch nipple, interactive buttons),
-Passes/cheapDOF, utilities, threejs-override.
+utilities, threejs-override.
 
 Changed (each marked `[world patch]` in the code):
 - `Game.js` is ours. It has the same name so his imports resolve. It boots the engine in his order and stubs the
@@ -26,6 +26,9 @@ Changed (each marked `[world patch]` in the code):
 - `Player.js`: drives only when `game.mode === 'drive'`, and only then moves the camera and touch joystick.
 - `View.js`: the focus point follows height too, and `game.cameraOverride` lets the jet's chase camera take over.
   The radius cap is 42 m, not his 30, because our jet and runway are about four times his car.
+- `Viewport.js`: the pixel-ratio cap is 1.5 (his 2) and is set once, so `game/Perf.js` can lower it.
+- `Rendering.js`: keeps `scenePassColor`, so Perf.js can drop the edge blur or the bloom on slow GPUs.
+- `Passes/cheapDOF.js`: 10 blur taps per pixel, not his 25.
 - `Ticker.js`: delta is never negative, and a zero-length frame is skipped. Either one panics Rapier.
 - `Materials/MeshDefaultMaterial.js`: his shading model, copied. Patches: the water band is off by default,
   `flipBackNormals` lets grass keep an up normal on both sides, and emissive is added for the hover glow. The reveal
@@ -37,6 +40,9 @@ Not used from his repo: his world (`World/`, all `Areas`), his server and multip
 kept read-only in `../vendor/folio-2025/` for reference.
 
 ## Ours (`game/`)
+- `Perf.js`: times real frames after the reveal; while the median is over 20 ms it steps down: pixel ratio 1.5 → 1,
+  then no edge blur and a 1024 shadow map, then no bloom.
+- `Batch.js`: merges static meshes that share a material into one draw call (the course's rock and dark posts).
 - `Reveal.js`: the opening, ported from his `Reveal.js`, `World/Intro.js` and `World/Grid.js`. A blue ring closes as
   the loader fades and shrinks away. A 7 m disc (his is 3.5 m) holding the robot, the desk and the jet's cockpit then opens on a dark blue grid, with a "Click to start"
   label (words in `site.js` → `world.intro`). A click, a tap, Enter, Space, W or ↑ sweeps the glowing edge out to 45 m
