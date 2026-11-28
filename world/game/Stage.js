@@ -81,8 +81,12 @@ export function height(x, z)
     h += smooth(90, 140, r) * smooth(0, 1, vnoise(x * 0.012 + 40, z * 0.012)) * 9     // hills near the edge
     let flat = 0
     for(const f of FLAT) flat = Math.max(flat, 1 - smooth(0.75, 1.25, Math.max(Math.abs(x - f.x) / f.w, Math.abs(z - f.z) / f.d)))
+    // the airfield: flat from the runway north past the start disc, the letters and the hangar (fading 26–40 m out),
+    // and south of it one low beach down to the sea, so no ridge stands across the strip
+    const dz = z + 112, rwX = 1 - smooth(112, 124, Math.abs(x))
+    flat = Math.max(flat, rwX * (dz > 0 ? 1 - smooth(26, 40, dz) : 1))
     h = h * (1 - flat) + 0.6 * flat
-    const coast = smooth(R_LAND, R_LAND + 28, r)                                      // beach down into the sea
+    const coast = smooth(R_LAND, R_LAND + 28, r) * (1 - rwX * (1 - smooth(10, 16, Math.abs(dz))))   // beach down into the sea; not under the runway's ends
     return h * (1 - coast) - 4 * coast
 }
 
